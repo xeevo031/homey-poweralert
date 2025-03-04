@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>EskomSePush Settings</title>
+  <script
+    type="text/javascript"
+    src="/homey.js"
+    data-origin="settings"
+  ></script>
+  <style>
+    .container {
+      margin: 0 auto;
+      max-width: 400px;
+      padding: 20px;
+    }
+    .field {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #00c1fc;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 193, 252, 0.3);
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-wrapper .tooltip {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: help;
+      color: #888;
+      font-size: 16px;
+    }
+    .input-wrapper .tooltip:hover::after {
+      content: "Your EskomSePush API token is required to access the API. Get one from the link below.";
+      position: absolute;
+      width: 200px;
+      background: #333;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      right: 0;
+      z-index: 10;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #00c1fc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    button:hover {
+      background-color: #0097c4;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      transition: all 0.3s;
+      border-left: 4px solid #ccc;
+    }
+    .status.success {
+      border-left-color: #4CAF50;
+      background-color: #f0f7f0;
+    }
+    .status.error {
+      border-left-color: #f44336;
+      background-color: #fdf0f0;
+    }
+    .status.warning {
+      border-left-color: #ff9800;
+      background-color: #fff8f0;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .loading.active {
+      display: block;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #00c1fc;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .debug {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none; /* Hide debug by default */
+      border: 1px solid #ddd;
+    }
+    .debug pre {
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .error-message {
+      color: #f44336;
+      font-weight: bold;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #fdf0f0;
+      border-radius: 4px;
+      border-left: 4px solid #f44336;
+      display: none;
+    }
+    .success-message {
+      color: #4CAF50;
+      font-weight: bold;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #f0f7f0;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+      display: none;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-header {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .card-header h3 {
+      margin: 0;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>EskomSePush Settings</h2>
+    
+    <div id="loading" class="loading active">
+      <div class="spinner"></div>
+      <p>Loading settings...</p>
+    </div>
+    
+    <div id="error-container" class="error-message"></div>
+    <div id="success-container" class="success-message" style="display: none;"></div>
+    
+    <div id="content" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <h3>API Configuration</h3>
+        </div>
+        <div class="field">
+          <label for="apiToken">EskomSePush API Token</label>
+          <div class="input-wrapper">
+            <input type="text" id="apiToken" placeholder="Enter your API token">
+            <span class="tooltip">ⓘ</span>
+          </div>
+          <p><small>You can get an API token from <a href="https://eskomsepush.gumroad.com/l/api" target="_blank">https://eskomsepush.gumroad.com/l/api</a></small></p>
+        </div>
+        
+        <div class="button-group">
+          <button id="saveButton">Save</button>
+          <button id="checkApiButton">Check</button>
+          <button id="clearButton">Reset</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3>API Status</h3>
+        </div>
+        <div class="field">
+          <div id="apiStatus" class="status">Not checked yet</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="debug" class="debug">
+      <h3>Debug Information</h3>
+      <pre id="debugInfo"></pre>
+      <button id="toggleDebug">Show Debug Info</button>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // Global error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error('Global error:', message, error);
+      showErrorMessage('Global error: ' + message);
+      log('Global error', { message, source, lineno, colno, error: error ? error.toString() : 'No error object' });
+      return true;
+    };
+
+    // Debug function
+    function log(message, data) {
+      console.log(message, data);
+      
+      try {
+        const debugInfo = document.getElementById('debugInfo');
+        if (!debugInfo) {
+          console.error('Debug info element not found');
+          return;
+        }
+        
+        const timestamp = new Date().toISOString();
+        let logMessage = `${timestamp}: ${message}`;
+        
+        if (data) {
+          try {
+            logMessage += '\n' + JSON.stringify(data, null, 2);
+          } catch (e) {
+            logMessage += '\n[Error stringifying data: ' + e.message + ']';
+          }
+        }
+        
+        debugInfo.textContent += logMessage + '\n\n';
+      } catch (e) {
+        console.error('Error in log function:', e);
+      }
+    }
+    
+    // Show error in UI
+    function showError(message) {
+      try {
+        const content = document.getElementById('content');
+        const loading = document.getElementById('loading');
+        
+        if (loading) loading.classList.remove('active');
+        if (content) content.style.display = 'block';
+        
+        const apiStatus = document.getElementById('apiStatus');
+        if (apiStatus) {
+          apiStatus.innerText = 'Error: ' + message;
+          apiStatus.style.color = 'red';
+        }
+        
+        // Don't automatically show debug info on error
+        // const debug = document.getElementById('debug');
+        // if (debug) debug.style.display = 'block';
+        
+        log('Error occurred', message);
+        showErrorMessage(message);
+      } catch (e) {
+        console.error('Error in showError function:', e);
+      }
+    }
+    
+    // Show error message in dedicated container
+    function showErrorMessage(message) {
+      try {
+        const errorContainer = document.getElementById('error-container');
+        if (errorContainer) {
+          errorContainer.innerHTML = '<div style="display:flex;align-items:center;">' +
+            '<span style="color:red;font-size:18px;margin-right:10px;">✗</span>' +
+            '<div>' + message + '</div></div>';
+          errorContainer.style.display = 'block';
+          
+          // Automatically hide error after 5 seconds
+          setTimeout(function() {
+            errorContainer.style.display = 'none';
+          }, 5000);
+        }
+      } catch (e) {
+        console.error('Error in showErrorMessage function:', e);
+      }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      log('DOMContentLoaded event fired');
+      
+      // Check if Homey object exists
+      if (typeof Homey === 'undefined') {
+        log('Homey object is undefined');
+        showError('Homey object is not available. This page must be loaded within the Homey app.');
+      } else {
+        log('Homey object is available');
+      }
+    });
+
+    function onHomeyReady(Homey) {
+      try {
+        log('onHomeyReady called', { homeyExists: !!Homey });
+        
+        if (!Homey) {
+          log('Homey object is null or undefined in onHomeyReady');
+          showError('Homey object is not available. This page must be loaded within the Homey app.');
+          return;
+        }
+        
+        // Check if Homey API methods exist
+        log('Checking Homey API methods', {
+          hasGet: typeof Homey.get === 'function',
+          hasSet: typeof Homey.set === 'function',
+          hasApi: typeof Homey.api === 'function',
+          hasReady: typeof Homey.ready === 'function'
+        });
+        
+        // Tell Homey we're ready to be displayed
+        log('Calling Homey.ready()');
+        Homey.ready();
+        log('Homey.ready() called successfully');
+        
+        // Toggle debug info
+        const toggleDebugButton = document.getElementById('toggleDebug');
+        if (toggleDebugButton) {
+          toggleDebugButton.addEventListener('click', function() {
+            const debug = document.getElementById('debug');
+            if (!debug) return;
+            
+            if (debug.style.display === 'none' || debug.style.display === '') {
+              debug.style.display = 'block';
+              toggleDebugButton.textContent = 'Hide Debug Info';
+            } else {
+              debug.style.display = 'none';
+              toggleDebugButton.textContent = 'Show Debug Info';
+            }
+          });
+        }
+
+        // Get the current API token
+        log('Getting API token from settings');
+        Homey.get('apiToken', function(err, apiToken) {
+          if (err) {
+            log('Error getting API token', err);
+            showError('Error getting API token: ' + (err.message || err));
+            return;
+          }
+          
+          log('API token retrieved', { hasToken: !!apiToken, tokenLength: apiToken ? apiToken.length : 0 });
+          
+          // Set the token in the input field
+          const apiTokenInput = document.getElementById('apiToken');
+          if (apiTokenInput) {
+            apiTokenInput.value = apiToken || '';
+          }
+          
+          // Show content, hide loading
+          const loading = document.getElementById('loading');
+          const content = document.getElementById('content');
+          
+          if (loading) loading.classList.remove('active');
+          if (content) content.style.display = 'block';
+          
+          // Automatically check API status if a token exists
+          if (apiToken && apiToken.trim() !== '') {
+            log('Token exists, automatically checking API status on page load');
+            const apiStatus = document.getElementById('apiStatus');
+            if (apiStatus) {
+              apiStatus.innerHTML = '<div class="spinner" style="display:inline-block;width:20px;height:20px;vertical-align:middle;margin-right:10px;"></div> Checking...';
+            }
+            
+            // Short delay to ensure UI is updated before API call
+            setTimeout(function() {
+              checkApiStatus(Homey, apiStatus);
+            }, 500);
+          }
+        });
+
+        // Function to check API status - extracted for reuse
+        function checkApiStatus(Homey, apiStatusElement, action) {
+          log('Checking API status' + (action ? ' after ' + action : ''));
+          
+          // Clear any previous error messages
+          const errorContainer = document.getElementById('error-container');
+          if (errorContainer) {
+            errorContainer.innerText = '';
+            errorContainer.style.display = 'none';
+          }
+          
+          // Disable check button during API call
+          const checkApiButton = document.getElementById('checkApiButton');
+          if (checkApiButton) {
+            checkApiButton.disabled = true;
+            checkApiButton.innerHTML = '<div class="spinner" style="display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:5px;"></div> Checking...';
+          }
+          
+          Homey.api('POST', '/check-api', {}, function(err, result) {
+            // Re-enable check button
+            if (checkApiButton) {
+              checkApiButton.disabled = false;
+              checkApiButton.innerHTML = 'Check';
+            }
+            
+            if (err) {
+              log('API check error', err);
+              
+              // Enhanced error handling with specific messages
+              let errorMessage = '';
+              if (err.code === 401 || (err.message && err.message.includes('unauthorized'))) {
+                errorMessage = 'Invalid API token. Please check your token and try again.';
+              } else if (err.code === 429 || (err.message && err.message.includes('rate limit'))) {
+                errorMessage = 'API rate limit exceeded. Please try again later.';
+              } else if (err.code >= 500 || (err.message && err.message.includes('server'))) {
+                errorMessage = 'EskomSePush server error. Please try again later.';
+              } else if (err.message && err.message.includes('network')) {
+                errorMessage = 'Network error. Please check your internet connection.';
+              } else {
+                errorMessage = 'Error: ' + (err.message || err);
+              }
+              
+              if (apiStatusElement) {
+                // Remove any existing status classes
+                apiStatusElement.classList.remove('success', 'warning', 'error');
+                // Add error class
+                apiStatusElement.classList.add('error');
+                
+                apiStatusElement.innerHTML = '<div style="display:flex;align-items:center;">' +
+                  '<span style="color:red;font-size:24px;margin-right:10px;">✗</span>' +
+                  '<div>' + errorMessage + '</div></div>';
+              }
+              
+              showErrorMessage(errorMessage);
+              return;
+            }
+            
+            log('API check result', result);
+            
+            if (apiStatusElement) {
+              // Remove any existing status classes
+              apiStatusElement.classList.remove('success', 'warning', 'error');
+              
+              if (result && result.success) {
+                // Add success class
+                apiStatusElement.classList.add('success');
+                
+                // Add action-specific message
+                let actionMessage = '';
+                if (action === 'saving') {
+                  actionMessage = '<div style="margin-top:5px;font-weight:bold;color:green;">API Token saved successfully!</div>';
+                }
+                
+                // Enhanced UI feedback with icons and better formatting
+                apiStatusElement.innerHTML = '<div style="display:flex;align-items:center;">' +
+                  '<span style="color:green;font-size:24px;margin-right:10px;">✓</span>' +
+                  '<div>' +
+                  '<div style="font-weight:bold;color:green;">API connection successful!</div>' +
+                  actionMessage +
+                  '<div>Allowance: <span style="font-weight:bold;">' + result.allowance.count + '/' + result.allowance.limit + '</span></div>' +
+                  '</div></div>';
+              } else {
+                // Add error class
+                apiStatusElement.classList.add('error');
+                
+                const failMessage = (result ? result.message : 'Unknown error');
+                apiStatusElement.innerHTML = '<div style="display:flex;align-items:center;">' +
+                  '<span style="color:red;font-size:24px;margin-right:10px;">✗</span>' +
+                  '<div style="color:red;">Failed: ' + failMessage + '</div></div>';
+                
+                showErrorMessage('API check failed: ' + failMessage);
+              }
+            }
+          });
+        }
+
+        // Save API token when button is clicked
+        const saveButton = document.getElementById('saveButton');
+        if (saveButton) {
+          saveButton.addEventListener('click', function() {
+            const apiTokenInput = document.getElementById('apiToken');
+            if (!apiTokenInput) {
+              showError('API token input not found');
+              return;
+            }
+            
+            const token = apiTokenInput.value;
+            log('Saving API token', { tokenLength: token.length });
+            
+            // Disable save button and show spinner
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<div class="spinner" style="display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:5px;"></div> Saving...';
+            
+            Homey.set('apiToken', token, function(err) {
+              // Re-enable save button
+              saveButton.disabled = false;
+              saveButton.innerHTML = 'Save';
+              
+              if (err) {
+                log('Error saving API token', err);
+                showError('Error saving API token: ' + (err.message || err));
+                return;
+              }
+              
+              log('API token saved successfully');
+              
+              // No longer show a separate success message
+              // Instead, we'll show the status directly in the API Status section
+              
+              // Automatically check API status after saving
+              log('Automatically checking API status after saving token');
+              const apiStatus = document.getElementById('apiStatus');
+              if (apiStatus) {
+                apiStatus.innerHTML = '<div class="spinner" style="display:inline-block;width:20px;height:20px;vertical-align:middle;margin-right:10px;"></div> Checking...';
+              }
+              
+              // Use the extracted function with 'saving' action
+              checkApiStatus(Homey, apiStatus, 'saving');
+            });
+          });
+        }
+
+        // Clear API token when button is clicked
+        const clearButton = document.getElementById('clearButton');
+        if (clearButton) {
+          clearButton.addEventListener('click', function() {
+            log('Reset API token button clicked');
+            
+            // No confirmation, directly clear the token
+            log('Resetting API token');
+            
+            // Clear the input field
+            const apiTokenInput = document.getElementById('apiToken');
+            if (apiTokenInput) {
+              apiTokenInput.value = '';
+            }
+            
+            // Disable reset button and show spinner
+            clearButton.disabled = true;
+            clearButton.innerHTML = '<div class="spinner" style="display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:5px;"></div> Resetting...';
+            
+            // Remove from settings
+            Homey.unset('apiToken', function(err) {
+              // Re-enable reset button
+              clearButton.disabled = false;
+              clearButton.innerHTML = 'Reset';
+              
+              if (err) {
+                log('Error resetting API token', err);
+                showErrorMessage('Error resetting API token: ' + (err.message || err));
+                return;
+              }
+              
+              log('API token reset successfully');
+              
+              // No longer show a separate success message
+              // Instead, update the API status directly
+              
+              // Update API status
+              const apiStatus = document.getElementById('apiStatus');
+              if (apiStatus) {
+                // Remove any existing status classes
+                apiStatus.classList.remove('success', 'warning', 'error');
+                // Add warning class
+                apiStatus.classList.add('warning');
+                
+                apiStatus.innerHTML = '<div style="display:flex;align-items:center;">' +
+                  '<span style="color:orange;font-size:24px;margin-right:10px;">⚠</span>' +
+                  '<div>API token has been reset. Please set a new token.</div></div>';
+              }
+            });
+          });
+        }
+
+        // Check API button
+        const checkApiButton = document.getElementById('checkApiButton');
+        if (checkApiButton) {
+          checkApiButton.addEventListener('click', function() {
+            const apiStatus = document.getElementById('apiStatus');
+            if (apiStatus) {
+              apiStatus.innerHTML = '<div class="spinner" style="display:inline-block;width:20px;height:20px;vertical-align:middle;margin-right:10px;"></div> Checking...';
+            }
+            
+            // Use the extracted function with no specific action
+            checkApiStatus(Homey, apiStatus);
+          });
+        }
+
+        // Add a debug button to the main UI
+        const debugButton = document.createElement('button');
+        debugButton.id = 'showDebugButton';
+        debugButton.textContent = 'Show Debug Info';
+        debugButton.style.marginTop = '20px';
+        
+        // Add the debug button to the bottom of the container
+        const container = document.querySelector('.container');
+        if (container) {
+          container.appendChild(debugButton);
+        }
+        
+        // Add event listener to the debug button
+        debugButton.addEventListener('click', function() {
+          const debug = document.getElementById('debug');
+          if (!debug) return;
+          
+          if (debug.style.display === 'none' || debug.style.display === '') {
+            debug.style.display = 'block';
+            debugButton.textContent = 'Hide Debug Info';
+            toggleDebugButton.textContent = 'Hide Debug Info';
+          } else {
+            debug.style.display = 'none';
+            debugButton.textContent = 'Show Debug Info';
+            toggleDebugButton.textContent = 'Show Debug Info';
+          }
+        });
+        
+        // Add debug button to check API directly
+        const debugApiButton = document.createElement('button');
+        debugApiButton.id = 'debugApiButton';
+        debugApiButton.textContent = 'Debug API';
+        debugApiButton.style.marginTop = '10px';
+        
+        const debugContainer = document.getElementById('debug');
+        if (debugContainer) {
+          const heading = debugContainer.querySelector('h3');
+          if (heading) {
+            heading.parentNode.insertBefore(debugApiButton, heading.nextSibling);
+          }
+        }
+        
+        debugApiButton.addEventListener('click', function() {
+          log('Debug API button clicked');
+          
+          Homey.api('GET', '/debug-api', {}, function(err, result) {
+            if (err) {
+              log('Debug API error', err);
+              showErrorMessage('Debug API error: ' + (err.message || err));
+              return;
+            }
+            
+            log('Debug API result', result);
+            
+            if (result && result.success) {
+              const debugInfo = document.getElementById('debugInfo');
+              if (debugInfo) {
+                debugInfo.textContent += '\n\n--- API DEBUG INFO ---\n' + 
+                  JSON.stringify(result.debug, null, 2);
+              }
+            } else {
+              showErrorMessage('Debug API failed: ' + (result ? result.message : 'Unknown error'));
+            }
+          });
+        });
+      } catch (e) {
+        console.error('Error in onHomeyReady', e);
+        log('Error in onHomeyReady', { error: e.toString(), stack: e.stack });
+        showError('Initialization error: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html> 
