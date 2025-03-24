@@ -9,23 +9,25 @@ jobs:
   main:
     name: Validate Homey App
     runs-on: ubuntu-latest
+    container:
+      image: node:16-bullseye
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          
       - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libvips-dev build-essential
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential \
+            python3 \
+            libvips \
+            libvips-dev \
+            libvips-tools
           
       - name: Install dependencies
         run: |
-          npm install --include=optional
-          npm install --platform=linux --arch=x64 sharp
+          npm config set unsafe-perm true
+          npm install --unsafe-perm
         
       - name: Build TypeScript
         run: npm run build
