@@ -17,24 +17,9 @@ jobs:
         with:
           node-version: '16'
           
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            libvips-dev \
-            pkg-config
-            
-      - name: Install dependencies
-        run: |
-          npm install --ignore-scripts
-          npm rebuild sharp --build-from-source
-          npm install homey@3.7.15 --save-exact
-        env:
-          SHARP_IGNORE_GLOBAL_LIBVIPS: "1"
-        
-      - name: Build TypeScript
-        run: npm run build
+      - run: npm install
+      
+      - run: npm run build
         
       - uses: athombv/github-action-homey-app-validate@master
         with:
