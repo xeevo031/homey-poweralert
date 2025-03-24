@@ -9,19 +9,8 @@ jobs:
   main:
     name: Validate Homey App
     runs-on: ubuntu-latest
-    container:
-      image: athombv/homey-cli:latest
-      options: --user root
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: |
-          npm install
-        
-      - name: Build TypeScript
-        run: npm run build
-        
       - uses: athombv/github-action-homey-app-validate@master
         with:
           level: verified 
