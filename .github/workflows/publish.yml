@@ -1,8 +1,8 @@
 name: Publish Homey App
-
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -11,14 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: athombv/github-action-homey-app-validate@master
+      
+      - uses: actions/setup-node@v4
         with:
-          level: verified
-      - uses: athombv/github-action-homey-app-publish@master
+          node-version: '16'
+          
+      - run: npm install
+      
+      - run: npm run build
+      
+      - name: Validate App
+        uses: athombv/github-action-homey-app-validate@master
+        with:
+          level: publish
+        
+      - name: Publish
+        uses: athombv/github-action-homey-app-publish@master
         id: publish
         with:
           personal_access_token: ${{ secrets.HOMEY_PAT }}
-      
+
       - name: URL
         run: |
           echo "Manage your app at ${{ steps.publish.outputs.url }}." >> $GITHUB_STEP_SUMMARY 
