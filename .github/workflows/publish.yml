@@ -22,16 +22,18 @@ jobs:
         run: |
           git config --global --add safe.directory /github/workspace
       
-      - name: Install production dependencies
+      - name: Install dependencies
         run: |
           rm -f package-lock.json
-          # Install only production dependencies first
-          npm install --production --no-package-lock
-      
-      - name: Install dev dependencies
-        run: |
-          # Now add dev dependencies
-          npm install --save-dev @types/node@16 typescript @types/homey@3.3.11 eslint eslint-config-athom
+          # Install all dependencies including dev
+          npm install --no-package-lock
+          # Install Homey types from npm package
+          npm install --save-dev homey-apps-sdk-v3-types@0.3.10
+          # Install specific versions of problematic packages
+          npm install --save-dev @types/node@16.18.86
+          npm install --save-dev typescript@5.0.4
+          npm install --save-dev eslint@7.32.0
+          npm install --save-dev eslint-config-athom@3.1.5
       
       - run: npm run build
       
