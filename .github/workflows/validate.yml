@@ -9,18 +9,20 @@ jobs:
   main:
     name: Validate Homey App
     runs-on: ubuntu-latest
+    container:
+      image: node:16-alpine
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          
+      - name: Install system dependencies
+        run: |
+          apk add --no-cache python3 make g++ vips-dev
+      
       - name: Install dependencies
         run: |
           npm install
-          npm install --platform=linuxmusl --arch=x64 sharp
+          npm install sharp --ignore-scripts
+          npm rebuild sharp
       
       - run: npm run build
         
