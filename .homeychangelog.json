@@ -1,0 +1,12 @@
+{
+  "1.0.0": {
+    "en": "Initial release of PowerAlert app for Homey",
+    "changes": [
+      "Added PowerStatus driver for monitoring Eskom load shedding status",
+      "Added triggers for probability and stage changes",
+      "Added conditions for checking probability and current stage",
+      "Added action to manually update data",
+      "Added capabilities for monitoring various power status metrics"
+    ]
+  }
+} 
