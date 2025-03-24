@@ -10,7 +10,7 @@ jobs:
     name: Publish Homey App
     runs-on: ubuntu-latest
     container:
-      image: node:14-alpine
+      image: node:18-alpine
     steps:
       - uses: actions/checkout@v4
       
@@ -20,13 +20,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # First install all dependencies for build
-          npm ci || npm install
-          # Then remove dev dependencies for production
+          # Clean install dependencies
+          npm install --no-package-lock
+          # Build the project
+          npm run build
+          # Remove dev dependencies
           npm prune --production
-        
-      - name: Build
-        run: npm run build
         
       - name: Validate
         uses: athombv/github-action-homey-app-validate@master
