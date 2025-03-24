@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           
       - name: Install system dependencies
         run: |
@@ -29,14 +29,14 @@ jobs:
             g++ \
             make
             
-      - name: Install sharp globally
+      - name: Clear npm cache
         run: |
-          sudo npm install -g sharp
+          npm cache clean --force
           
       - name: Install dependencies
         run: |
           npm install
-          npm ls sharp || true
+          npm install sharp@0.32.6 --cpu=x64 --os=linux --libc=glibc
         
       - name: Build TypeScript
         run: npm run build
