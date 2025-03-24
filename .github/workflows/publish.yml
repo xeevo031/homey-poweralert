@@ -9,15 +9,16 @@ jobs:
   main:
     name: Publish Homey App
     runs-on: ubuntu-latest
+    container:
+      image: node:14-alpine
     steps:
       - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          cache: 'npm'
-          
-      - run: npm ci
+      - name: Install system dependencies
+        run: |
+          apk add --no-cache python3 make g++
+      
+      - run: npm install
       
       - run: npm run build
       
