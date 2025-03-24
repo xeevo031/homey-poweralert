@@ -17,9 +17,26 @@ jobs:
         with:
           node-version: '16'
           
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            python3 \
+            libvips \
+            libvips-dev \
+            gcc \
+            g++ \
+            make
+            
+      - name: Install sharp globally
+        run: |
+          sudo npm install -g sharp
+          
       - name: Install dependencies
         run: |
-          npm install --no-optional
+          npm install
+          npm ls sharp || true
         
       - name: Build TypeScript
         run: npm run build
