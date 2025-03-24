@@ -12,15 +12,15 @@ jobs:
     container:
       image: node:14-alpine
     steps:
-      - name: Configure git
-        run: |
-          git config --global --add safe.directory /github/workspace
-      
-      - uses: actions/checkout@v4
-      
       - name: Install system dependencies
         run: |
           apk add --no-cache python3 make g++ git
+      
+      - uses: actions/checkout@v4
+      
+      - name: Configure git
+        run: |
+          git config --global --add safe.directory /github/workspace
       
       - name: Clean install
         run: |
