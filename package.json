@@ -6,6 +6,7 @@
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
   },
   "dependencies": {
+    "homey": "^3.7.15",
     "node-fetch": "^2.6.7"
   },
   "devDependencies": {
