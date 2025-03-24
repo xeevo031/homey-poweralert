@@ -10,36 +10,20 @@ jobs:
     name: Publish Homey App
     runs-on: ubuntu-latest
     container:
-      image: node:16-alpine
+      image: node:14-alpine
     steps:
-      - name: Install system dependencies
-        run: |
-          apk add --no-cache python3 make g++ git vips-dev
-      
       - uses: actions/checkout@v4
       
-      - name: Configure git
+      - name: Install system dependencies
         run: |
-          git config --global --add safe.directory /github/workspace
+          apk add --no-cache python3 make g++
       
-      - name: Install global sharp
-        run: |
-          npm install -g sharp@0.30.7 --unsafe-perm=true
-      
-      - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          # Install all dependencies including dev
-          npm install --no-package-lock
-          # Install dev dependencies
-          npm install --save-dev homey-apps-sdk-v3-types@0.3.10 @types/node@16.18.86 typescript@5.0.4 eslint@7.32.0 eslint-config-athom@3.1.5
+      - run: npm install
       
       - run: npm run build
       
       - name: Validate
         uses: athombv/github-action-homey-app-validate@master
-        env:
-          SHARP_IGNORE_GLOBAL_LIBVIPS: "1"
         with:
           level: publish
         
