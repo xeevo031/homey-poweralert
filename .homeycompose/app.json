@@ -1,6 +1,6 @@
 {
   "id": "za.co.xeevo.poweralert",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "platforms": [
@@ -12,12 +12,8 @@
   "description": {
     "en": "Power Alert converts electricity demand data into status levels which are then communicated to the public. The Power Alert makes use of real-time data and takes into account historical loads, current real-time loads, weather conditions, supply and network conditions"
   },
-  "category": [
-    "internet"
-  ],
-  "permissions": [
-    "homey:app:internet"
-  ],
+  "category": "energy",
+  "permissions": [],
   "brandColor": "#114590",
   "images": {
     "small": "/assets/images/small.png",
@@ -25,11 +21,9 @@
     "xlarge": "/assets/images/xlarge.png"
   },
   "bugs": {
-    "url": "https://github.com/xeevo031/za.co.xeevo.poweralert/issues"
+    "url": "https://github.com/xeevo031/homey-poweralert/issues"
   },
-  "source": "https://github.com/xeevo031/za.co.xeevo.poweralert",
-  "homepage": "https://xeevo.co.za",
-  "support": "https://xeevo.co.za/support",
+  "source": "https://github.com/xeevo031/homey-poweralert",
 
   "author": {
     "name": "Neil Donnelly",

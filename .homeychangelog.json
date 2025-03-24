@@ -1,4 +1,12 @@
 {
+  "1.0.2": {
+    "en": "App improvements and category update",
+    "changes": [
+      "Removed unnecessary internet permission as it's not required",
+      "Updated app category to 'energy' for better discoverability",
+      "Updated repository links"
+    ]
+  },
   "1.0.1": {
     "en": "Improved app security by reducing required permissions",
     "changes": [

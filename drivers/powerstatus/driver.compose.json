@@ -22,9 +22,8 @@
   ],
   "images": {
     "small": "/drivers/powerstatus/assets/images/small.png",
-    "large": "/drivers/powerstatus/assets/images/large.png",
-    "xlarge": "/drivers/powerstatus/assets/images/xlarge.png"
-  },
+    "large": "/drivers/powerstatus/assets/images/large.png"
+   },
   "pair": [
     {
       "id": "list_devices",
