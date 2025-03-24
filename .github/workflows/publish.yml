@@ -12,13 +12,21 @@ jobs:
     container:
       image: node:14-alpine
     steps:
+      - name: Configure git
+        run: |
+          git config --global --add safe.directory /github/workspace
+      
       - uses: actions/checkout@v4
       
       - name: Install system dependencies
         run: |
-          apk add --no-cache python3 make g++
+          apk add --no-cache python3 make g++ git
       
-      - run: npm install
+      - name: Clean install
+        run: |
+          rm -f package-lock.json
+          npm install --no-package-lock
+          npm install --save-dev @types/homey@3.3.11
       
       - run: npm run build
       
