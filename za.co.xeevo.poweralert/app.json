@@ -1,0 +1,391 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "za.co.xeevo.poweralert",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Power Alert"
+  },
+  "description": {
+    "en": "Power Alert converts electricity demand data into status levels which are then communicated to the public. The Power Alert makes use of real-time data and takes into account historical loads, current real-time loads, weather conditions, supply and network conditions"
+  },
+  "category": [
+    "internet"
+  ],
+  "permissions": [
+    "homey:manager:api"
+  ],
+  "brandColor": "#114590",
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "bugs": {
+    "url": "https://github.com/xeevo031/za.co.xeevo.poweralert/issues"
+  },
+  "source": "https://github.com/xeevo031/za.co.xeevo.poweralert",
+  "homepage": "https://xeevo.co.za",
+  "support": "https://xeevo.co.za/support",
+  "author": {
+    "name": "Neil Donnelly",
+    "email": "neil@xeevo.co.za"
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "probability_changed",
+        "title": {
+          "en": "Power probability has changed significantly"
+        },
+        "titleFormatted": {
+          "en": "Power probability has changed from [[previous_probability]]% to [[current_probability]]%"
+        },
+        "hint": {
+          "en": "Triggers when the power probability changes by at least 10%."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_probability",
+            "type": "number",
+            "title": {
+              "en": "Previous Probability"
+            }
+          },
+          {
+            "name": "current_probability",
+            "type": "number",
+            "title": {
+              "en": "Current Probability"
+            }
+          }
+        ]
+      },
+      {
+        "id": "stage_changed",
+        "title": {
+          "en": "Loadshedding stage has changed"
+        },
+        "titleFormatted": {
+          "en": "Loadshedding stage has changed from [[previous_stage]] to [[current_stage]]"
+        },
+        "hint": {
+          "en": "Triggers when the loadshedding stage changes."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_stage",
+            "type": "number",
+            "title": {
+              "en": "Previous Stage"
+            }
+          },
+          {
+            "name": "current_stage",
+            "type": "number",
+            "title": {
+              "en": "Current Stage"
+            }
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "probability_below",
+        "title": {
+          "en": "Power probability !{{is|is not}} below"
+        },
+        "titleFormatted": {
+          "en": "Power probability !{{is|is not}} below [[threshold]]%"
+        },
+        "hint": {
+          "en": "Check if the current power probability is below the specified threshold."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "threshold",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "title": {
+              "en": "Threshold"
+            }
+          }
+        ]
+      },
+      {
+        "id": "stage_is",
+        "title": {
+          "en": "Loadshedding stage !{{is|is not}}"
+        },
+        "titleFormatted": {
+          "en": "Loadshedding stage !{{is|is not}} [[stage]]"
+        },
+        "hint": {
+          "en": "Check if the current loadshedding stage matches the specified value."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "stage",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "0",
+                "title": {
+                  "en": "0 (No Loadshedding)"
+                }
+              },
+              {
+                "id": "1",
+                "title": {
+                  "en": "1"
+                }
+              },
+              {
+                "id": "2",
+                "title": {
+                  "en": "2"
+                }
+              },
+              {
+                "id": "3",
+                "title": {
+                  "en": "3"
+                }
+              },
+              {
+                "id": "4",
+                "title": {
+                  "en": "4"
+                }
+              },
+              {
+                "id": "5",
+                "title": {
+                  "en": "5"
+                }
+              },
+              {
+                "id": "6",
+                "title": {
+                  "en": "6"
+                }
+              },
+              {
+                "id": "7",
+                "title": {
+                  "en": "7"
+                }
+              },
+              {
+                "id": "8",
+                "title": {
+                  "en": "8"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "update_data",
+        "title": {
+          "en": "Update PowerAlert data"
+        },
+        "hint": {
+          "en": "Force the PowerAlert device to update its data immediately."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "id": "powerstatus",
+      "name": {
+        "en": "Power Status"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "loadshedding_stage",
+        "power_probability",
+        "status_message",
+        "peak_demand",
+        "available_capacity",
+        "lowest_margin",
+        "forecast_highest_stage",
+        "last_updated"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "images": {
+        "small": "/drivers/powerstatus/assets/images/small.png",
+        "large": "/drivers/powerstatus/assets/images/large.png",
+        "xlarge": "/drivers/powerstatus/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "options": {
+            "singular": true
+          },
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "available_capacity": {
+      "type": "number",
+      "title": {
+        "en": "Available Capacity"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "forecast_highest_stage": {
+      "type": "number",
+      "title": {
+        "en": "Forecast Highest Stage"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/stage.svg",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "decimals": 0
+    },
+    "last_updated": {
+      "type": "string",
+      "title": {
+        "en": "Last Updated"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/update.svg"
+    },
+    "loadshedding_stage": {
+      "type": "number",
+      "title": {
+        "en": "Loadshedding Stage"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/stage.svg",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "decimals": 0
+    },
+    "lowest_margin": {
+      "type": "number",
+      "title": {
+        "en": "Lowest Margin"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "peak_demand": {
+      "type": "number",
+      "title": {
+        "en": "Peak Demand"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "power_probability": {
+      "type": "number",
+      "title": {
+        "en": "Power Probability"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/probability.svg",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "units": "%",
+      "decimals": 0
+    },
+    "status_message": {
+      "type": "string",
+      "title": {
+        "en": "Status Message"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/information-slab-circle-outline.svg"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+PowerAlert for Homey provides real-time monitoring of South Africa's power status and loadshedding information directly on your Homey system. Stay informed about the current loadshedding stage, power probability, and system status without having to check external sources.
+
+This integration helps South African households better manage their daily activities around potential power outages. By automating alerts and creating flows based on power status changes, you can prepare in advance - whether it's charging devices, planning meal times, or ensuring critical systems have backup power when needed most. The app automatically refreshes data every 10 minutes, ensuring you always have the latest information about the national power grid.

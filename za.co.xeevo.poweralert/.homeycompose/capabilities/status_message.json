@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Status Message"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/information-slab-circle-outline.svg"
+} 

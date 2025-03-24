@@ -1,0 +1,16 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Power Probability"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/probability.svg",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "units": "%",
+  "decimals": 0
+} 

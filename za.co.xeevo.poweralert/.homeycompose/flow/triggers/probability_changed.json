@@ -1,0 +1,33 @@
+{
+  "id": "probability_changed",
+  "title": {
+    "en": "Power probability has changed significantly"
+  },
+  "titleFormatted": {
+    "en": "Power probability has changed from [[previous_probability]]% to [[current_probability]]%"
+  },
+  "hint": {
+    "en": "Triggers when the power probability changes by at least 10%."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_probability",
+      "type": "number",
+      "title": {
+        "en": "Previous Probability"
+      }
+    },
+    {
+      "name": "current_probability",
+      "type": "number",
+      "title": {
+        "en": "Current Probability"
+      }
+    }
+  ]
+} 

@@ -1,0 +1,13 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Available Capacity"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 
