@@ -20,10 +20,12 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libvips-dev
+          sudo apt-get install -y libvips-dev build-essential
           
       - name: Install dependencies
-        run: npm install --include=optional
+        run: |
+          npm install --include=optional
+          npm install --platform=linux --arch=x64 sharp
         
       - name: Build TypeScript
         run: npm run build
