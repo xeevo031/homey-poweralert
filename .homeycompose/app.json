@@ -16,7 +16,7 @@
     "internet"
   ],
   "permissions": [
-    "homey:manager:api"
+    "homey:app:internet"
   ],
   "brandColor": "#114590",
   "images": {
