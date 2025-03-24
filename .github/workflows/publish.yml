@@ -15,12 +15,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '16'
+          cache: 'npm'
           
-      - run: npm install
+      - run: npm ci
       
       - run: npm run build
       
-      - name: Validate App
+      - name: Validate
         uses: athombv/github-action-homey-app-validate@master
         with:
           level: publish
