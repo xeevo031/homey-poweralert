@@ -1,0 +1,33 @@
+{
+  "id": "stage_changed",
+  "title": {
+    "en": "Loadshedding stage has changed"
+  },
+  "titleFormatted": {
+    "en": "Loadshedding stage has changed from [[previous_stage]] to [[current_stage]]"
+  },
+  "hint": {
+    "en": "Triggers when the loadshedding stage changes."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_stage",
+      "type": "number",
+      "title": {
+        "en": "Previous Stage"
+      }
+    },
+    {
+      "name": "current_stage",
+      "type": "number",
+      "title": {
+        "en": "Current Stage"
+      }
+    }
+  ]
+} 

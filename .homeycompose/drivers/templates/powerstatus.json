@@ -1,0 +1,43 @@
+{
+  "name": {
+    "en": "Power Status"
+  },
+  "class": "sensor",
+  "capabilities": [
+    "loadshedding_stage",
+    "power_probability",
+    "status_message",
+    "peak_demand",
+    "available_capacity",
+    "lowest_margin",
+    "forecast_highest_stage",
+    "last_updated"
+  ],
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "cloud"
+  ],
+  "images": {
+    "small": "/drivers/powerstatus/assets/images/small.png",
+    "large": "/drivers/powerstatus/assets/images/large.png",
+    "xlarge": "/drivers/powerstatus/assets/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "options": {
+        "singular": true
+      },
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+} 

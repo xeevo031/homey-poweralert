@@ -1,0 +1,29 @@
+{
+  "id": "probability_below",
+  "title": {
+    "en": "Power probability !{{is|is not}} below"
+  },
+  "titleFormatted": {
+    "en": "Power probability !{{is|is not}} below [[threshold]]%"
+  },
+  "hint": {
+    "en": "Check if the current power probability is below the specified threshold."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "title": {
+        "en": "Threshold"
+      }
+    }
+  ]
+} 

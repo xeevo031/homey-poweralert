@@ -1,0 +1,16 @@
+{
+  "id": "update_data",
+  "title": {
+    "en": "Update PowerAlert data"
+  },
+  "hint": {
+    "en": "Force the PowerAlert device to update its data immediately."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ]
+} 
