@@ -16,10 +16,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-          cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install
+          npm install homey@3.7.15 --save-exact
         
       - name: Build TypeScript
         run: npm run build
