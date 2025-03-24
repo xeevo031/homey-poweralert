@@ -10,7 +10,7 @@ jobs:
     name: Publish Homey App
     runs-on: ubuntu-latest
     container:
-      image: node:14-alpine
+      image: node:16-alpine
     steps:
       - name: Install system dependencies
         run: |
@@ -22,11 +22,16 @@ jobs:
         run: |
           git config --global --add safe.directory /github/workspace
       
-      - name: Clean install
+      - name: Install production dependencies
         run: |
           rm -f package-lock.json
-          npm install --no-package-lock
-          npm install --save-dev @types/homey@3.3.11
+          # Install only production dependencies first
+          npm install --production --no-package-lock
+      
+      - name: Install dev dependencies
+        run: |
+          # Now add dev dependencies
+          npm install --save-dev @types/node@16 typescript @types/homey@3.3.11 eslint eslint-config-athom
       
       - run: npm run build
       
