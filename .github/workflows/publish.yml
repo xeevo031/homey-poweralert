@@ -22,23 +22,24 @@ jobs:
         run: |
           git config --global --add safe.directory /github/workspace
       
+      - name: Install global sharp
+        run: |
+          npm install -g sharp@0.30.7 --unsafe-perm=true
+      
       - name: Install dependencies
         run: |
           rm -f package-lock.json
-          # Install only production dependencies first
-          npm install --production --no-package-lock
+          # Install all dependencies including dev
+          npm install --no-package-lock
           # Install dev dependencies
           npm install --save-dev homey-apps-sdk-v3-types@0.3.10 @types/node@16.18.86 typescript@5.0.4 eslint@7.32.0 eslint-config-athom@3.1.5
-      
-      - name: Install sharp for Alpine
-        run: |
-          npm uninstall sharp
-          npm install sharp --no-package-lock --platform=linuxmusl --arch=x64 --unsafe-perm=true
       
       - run: npm run build
       
       - name: Validate
         uses: athombv/github-action-homey-app-validate@master
+        env:
+          SHARP_IGNORE_GLOBAL_LIBVIPS: "1"
         with:
           level: publish
         
