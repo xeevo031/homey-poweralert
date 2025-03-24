@@ -10,18 +10,15 @@ jobs:
     name: Validate Homey App
     runs-on: ubuntu-latest
     container:
-      image: node:16-alpine
+      image: node:14-alpine
     steps:
       - uses: actions/checkout@v4
       
       - name: Install system dependencies
         run: |
-          apk add --no-cache python3 make g++ vips-dev
+          apk add --no-cache python3 make g++
       
-      - name: Install dependencies
-        run: |
-          npm install
-          npm install --platform=linuxmusl --arch=x64 sharp
+      - run: npm install
       
       - run: npm run build
         
