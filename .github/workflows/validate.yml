@@ -17,22 +17,9 @@ jobs:
         with:
           node-version: '16'
           
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            python3 \
-            libvips \
-            libvips-dev \
-            libvips-tools
-          
       - name: Install dependencies
         run: |
-          npm install --ignore-scripts
-          npm rebuild sharp --build-from-source
-        env:
-          SHARP_IGNORE_GLOBAL_LIBVIPS: "1"
+          npm install --no-optional
         
       - name: Build TypeScript
         run: npm run build
