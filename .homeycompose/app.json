@@ -15,10 +15,10 @@
   "category": "energy",
   "permissions": [],
   "brandColor": "#114590",
-  "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+   "images": {
+    "small": "assets/images/small.png",
+    "large": "assets/images/large.png",
+    "xlarge": "assets/images/xlarge.png"
   },
   "bugs": {
     "url": "https://github.com/xeevo031/homey-poweralert/issues"
