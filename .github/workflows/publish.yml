@@ -18,11 +18,12 @@ jobs:
         run: |
           apk add --no-cache python3 make g++
       
-      - name: Clean install dependencies
+      - name: Install dependencies
         run: |
-          rm -f package-lock.json
-          npm install --legacy-peer-deps --no-package-lock
-          npm install --only=prod --legacy-peer-deps
+          # First install all dependencies for build
+          npm ci || npm install
+          # Then remove dev dependencies for production
+          npm prune --production
         
       - name: Build
         run: npm run build
