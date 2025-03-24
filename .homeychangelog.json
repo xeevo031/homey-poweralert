@@ -1,4 +1,11 @@
 {
+  "1.0.1": {
+    "en": "Improved app security by reducing required permissions",
+    "changes": [
+      "Updated app permissions to only request internet access instead of full API access",
+      "Improved user trust and security by requesting minimal required permissions"
+    ]
+  },
   "1.0.0": {
     "en": "Initial release of PowerAlert app for Homey",
     "changes": [
