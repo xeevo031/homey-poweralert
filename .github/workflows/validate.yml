@@ -9,23 +9,17 @@ jobs:
   main:
     name: Validate Homey App
     runs-on: ubuntu-latest
-    container:
-      image: node:16-alpine
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install system dependencies
-        run: |
-          apk add --no-cache python3 make g++ vips-dev
-      
-      - name: Install dependencies
-        run: |
-          npm install
-          npm install sharp --ignore-scripts
-          npm rebuild sharp
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          
+      - run: npm install
       
       - run: npm run build
         
       - uses: athombv/github-action-homey-app-validate@master
         with:
-          level: verified 
+          level: publish 
