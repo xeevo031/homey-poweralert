@@ -9,34 +9,15 @@ jobs:
   main:
     name: Validate Homey App
     runs-on: ubuntu-latest
+    container:
+      image: athombv/homey-cli:latest
+      options: --user root
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            python3 \
-            libvips \
-            libvips-dev \
-            gcc \
-            g++ \
-            make
-            
-      - name: Clear npm cache
-        run: |
-          npm cache clean --force
-          
       - name: Install dependencies
         run: |
           npm install
-          npm install sharp@0.32.6 --cpu=x64 --os=linux --libc=glibc
         
       - name: Build TypeScript
         run: npm run build
