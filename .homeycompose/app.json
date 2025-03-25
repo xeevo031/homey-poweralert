@@ -1,6 +1,6 @@
 {
   "id": "za.co.poweralert",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "compatibility": ">=12.1.2",
   "sdk": 3,
   "platforms": [

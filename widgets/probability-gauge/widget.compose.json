@@ -1,15 +1,15 @@
 {
   "name": {
-    "en": "Current Stage"
+    "en": "Probability Gauge"
   },
-  "height": 188,
+  "height": 250,
   "transparent": false,
   "settings": [
     {
-      "id": "showDescription",
+      "id": "showStage",
       "type": "checkbox",
       "title": {
-        "en": "Show Stage Description"
+        "en": "Show Current Stage"
       },
       "value": true
     },
@@ -23,9 +23,9 @@
     }
   ],
   "api": {
-    "getStage": {
+    "getProbabilities": {
       "method": "GET",
-      "path": "/stage"
+      "path": "/probabilities"
     }
   }
 }

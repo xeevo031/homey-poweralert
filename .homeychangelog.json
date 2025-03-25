@@ -1,4 +1,12 @@
 {
+  "1.0.4": {
+    "en": "Added probability gauge widget",
+    "changes": [
+      "Added new probability gauge widget showing current, evening, and tomorrow's power probability",
+      "Added color-coded probability bars for easy interpretation",
+      "Added current stage display with last updated time"
+    ]
+  },
   "1.0.3": {
     "en": "Widget Creation",
     "changes": [

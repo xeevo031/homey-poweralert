@@ -1,0 +1,287 @@
+<html>
+  <head>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        padding: var(--homey-su-2);
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      .probability-bars {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin-bottom: var(--homey-su-2);
+      }
+
+      .probability-item {
+        display: flex;
+        flex-direction: column;
+        margin: var(--homey-su-1) 0;
+      }
+
+      .probability-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--homey-font-size-small);
+        color: var(--homey-color-text);
+        margin-bottom: var(--homey-su-1);
+      }
+
+      .probability-value {
+        font-weight: 500;
+      }
+
+      .probability-bar-container {
+        width: 100%;
+        height: 12px;
+        background-color: var(--homey-color-gray-light);
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .probability-bar {
+        height: 100%;
+        width: 0;
+        transition: width 0.5s ease, background-color 0.5s ease;
+      }
+
+      .stage-container {
+        text-align: center;
+        padding-top: var(--homey-su-2);
+        border-top: 1px solid var(--homey-color-gray-light);
+      }
+
+      .stage-label {
+        font-size: var(--homey-font-size-small);
+        color: var(--homey-color-text-light);
+        margin-bottom: var(--homey-su-1);
+      }
+
+      .stage-value {
+        font-size: var(--homey-font-size-large);
+        font-weight: bold;
+        color: var(--homey-color-text);
+        margin-bottom: var(--homey-su-1);
+      }
+
+      .last-update {
+        font-size: var(--homey-font-size-small);
+        color: var(--homey-color-text-light);
+      }
+
+      /* Loading animation */
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+
+      .loading .probability-bar-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        animation: shimmer 1.5s infinite;
+      }
+
+      .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        color: var(--homey-color-text-light);
+        padding: var(--homey-su-4);
+      }
+
+      .error-icon {
+        font-size: 24px;
+        margin-bottom: var(--homey-su-2);
+        color: var(--homey-color-error);
+      }
+
+      /* Probability bar colors */
+      .probability-high {
+        background-color: var(--homey-color-danger);
+      }
+      .probability-medium-high {
+        background-color: var(--homey-color-orange);
+      }
+      .probability-medium {
+        background-color: var(--homey-color-warning);
+      }
+      .probability-low {
+        background-color: var(--homey-color-success);
+      }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div class="container" id="mainContainer">
+      <div class="probability-bars" id="probabilityBars">
+        <!-- Probability bars will be added here -->
+      </div>
+      <div class="stage-container" id="stageContainer">
+        <div class="stage-label">Current Stage</div>
+        <div class="stage-value" id="stageValue">-</div>
+        <div class="last-update" id="lastUpdate"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function onHomeyReady(Homey) {
+        Homey.ready();
+        
+        const settings = Homey.getSettings();
+        const mainContainer = document.getElementById('mainContainer');
+        const stageContainer = document.getElementById('stageContainer');
+        const lastUpdate = document.getElementById('lastUpdate');
+        
+        // Show/hide stage based on settings
+        if (settings.showStage === false) {
+          stageContainer.style.display = 'none';
+        }
+
+        // Show/hide last update based on settings
+        if (settings.showLastUpdate === false) {
+          lastUpdate.style.display = 'none';
+        }
+
+        // Function to format time as HH:MM
+        function formatTime(dateString) {
+          const date = new Date(dateString);
+          return date.toLocaleTimeString('en-GB', { 
+            hour: '2-digit', 
+            minute: '2-digit'
+          });
+        }
+
+        function getColorClass(probability) {
+          if (probability <= 25) return 'probability-high';
+          if (probability <= 50) return 'probability-medium-high';
+          if (probability <= 75) return 'probability-medium';
+          return 'probability-low';
+        }
+
+        function showError(message) {
+          mainContainer.innerHTML = `
+            <div class="error-state">
+              <div class="error-icon">⚠️</div>
+              <div>${message}</div>
+            </div>
+          `;
+        }
+
+        function showLoading() {
+          const barsContainer = document.getElementById('probabilityBars');
+          barsContainer.classList.add('loading');
+        }
+
+        function hideLoading() {
+          const barsContainer = document.getElementById('probabilityBars');
+          barsContainer.classList.remove('loading');
+        }
+
+        function createProbabilityBar(data) {
+          const item = document.createElement('div');
+          item.className = 'probability-item';
+
+          const labelContainer = document.createElement('div');
+          labelContainer.className = 'probability-label';
+          
+          const label = document.createElement('span');
+          label.textContent = data.label;
+          
+          const value = document.createElement('span');
+          value.className = 'probability-value';
+          value.textContent = `${Math.round(data.probability)}%`;
+
+          labelContainer.appendChild(label);
+          labelContainer.appendChild(value);
+
+          const barContainer = document.createElement('div');
+          barContainer.className = 'probability-bar-container';
+
+          const bar = document.createElement('div');
+          bar.className = `probability-bar ${getColorClass(data.probability)}`;
+          
+          // Trigger reflow to enable animation
+          setTimeout(() => {
+            bar.style.width = `${data.probability}%`;
+          }, 50);
+
+          barContainer.appendChild(bar);
+          item.appendChild(labelContainer);
+          item.appendChild(barContainer);
+          return item;
+        }
+
+        async function updateWidget() {
+          try {
+            showLoading();
+            const result = await Homey.api('GET', '/probabilities');
+            
+            if (!result || typeof result.current?.probability === 'undefined') {
+              throw new Error('Invalid data received');
+            }
+
+            // Clear existing bars
+            const barsContainer = document.getElementById('probabilityBars');
+            barsContainer.innerHTML = '';
+            
+            // Add probability bars
+            barsContainer.appendChild(createProbabilityBar(result.current));
+            barsContainer.appendChild(createProbabilityBar(result.evening));
+            barsContainer.appendChild(createProbabilityBar(result.tomorrow));
+            
+            // Update stage
+            document.getElementById('stageValue').textContent = result.stage;
+            
+            // Update last updated time if it should be shown
+            if (settings.showLastUpdate !== false) {
+              document.getElementById('lastUpdate').textContent = `Last updated: ${formatTime(result.lastUpdate)}`;
+            }
+            
+            hideLoading();
+          } catch (error) {
+            console.error('Error updating widget:', error);
+            showError(error.message || 'Failed to load power status');
+          }
+        }
+
+        // Initial update
+        updateWidget();
+        
+        // Update every minute
+        setInterval(updateWidget, 60 * 1000);
+
+        // Listen for settings changes
+        Homey.on('settings_changed', (newSettings) => {
+          if (newSettings.showStage !== settings.showStage) {
+            stageContainer.style.display = newSettings.showStage ? 'block' : 'none';
+          }
+          if (newSettings.showLastUpdate !== settings.showLastUpdate) {
+            lastUpdate.style.display = newSettings.showLastUpdate ? 'block' : 'none';
+            if (newSettings.showLastUpdate) {
+              updateWidget(); // Refresh to show the time
+            }
+          }
+          Object.assign(settings, newSettings);
+        });
+      }
+    </script>
+  </body>
+</html>
