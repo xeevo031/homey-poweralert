@@ -1,7 +1,7 @@
 {
-  "id": "za.co.xeevo.poweralert",
-  "version": "1.0.2",
-  "compatibility": ">=5.0.0",
+  "id": "za.co.poweralert",
+  "version": "1.0.3",
+  "compatibility": ">=12.1.2",
   "sdk": 3,
   "platforms": [
     "local"
