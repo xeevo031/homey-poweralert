@@ -1,0 +1,47 @@
+{
+  "name": {
+    "en": "Current Stage"
+  },
+  "height": 188,
+  "transparent": false,
+  "settings": [
+    {
+      "id": "showDescription",
+      "type": "checkbox",
+      "title": {
+        "en": "Show Stage Description"
+      },
+      "value": true
+    },
+    {
+      "id": "showLastUpdate",
+      "type": "checkbox",
+      "title": {
+        "en": "Show Last Update Time"
+      },
+      "value": true
+    }
+  ],
+  "api": {
+    "getStage": {
+      "method": "GET",
+      "path": "/stage"
+    },
+    "getSomething": {
+      "method": "GET",
+      "path": "/"
+    },
+    "addSomething": {
+      "method": "POST",
+      "path": "/"
+    },
+    "updateSomething": {
+      "method": "PUT",
+      "path": "/:id"
+    },
+    "deleteSomething": {
+      "method": "DELETE",
+      "path": "/:id"
+    }
+  }
+}
