@@ -1,0 +1,37 @@
+{
+  "id": "system_color",
+  "type": "string",
+  "title": {
+    "en": "System Color"
+  },
+  "desc": {
+    "en": "Current system status color (red/orange/green)"
+  },
+  "insights": true,
+  "insightsTitleTrue": {
+    "en": "System Color"
+  },
+  "getable": true,
+  "setable": false,
+  "icon": "/assets/traffic-light.svg",
+  "values": [
+    {
+      "id": "red",
+      "title": {
+        "en": "Red"
+      }
+    },
+    {
+      "id": "orange",
+      "title": {
+        "en": "Orange"
+      }
+    },
+    {
+      "id": "green",
+      "title": {
+        "en": "Green"
+      }
+    }
+  ]
+} 

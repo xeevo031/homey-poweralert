@@ -1,0 +1,72 @@
+{
+  "id": "calculate_energy_risk_score",
+  "title": {
+    "en": "Calculate Energy Risk Score"
+  },
+  "titleFormatted": {
+    "en": "Calculate energy risk score with [[sensitivity]] sensitivity"
+  },
+  "hint": {
+    "en": "Computes a risk score based on current status and forecast"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "sensitivity",
+      "type": "dropdown",
+      "title": {
+        "en": "Risk Sensitivity"
+      },
+      "values": [
+        {
+          "id": "low",
+          "title": {
+            "en": "Low"
+          }
+        },
+        {
+          "id": "medium",
+          "title": {
+            "en": "Medium"
+          }
+        },
+        {
+          "id": "high",
+          "title": {
+            "en": "High"
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "risk_score",
+      "type": "number",
+      "title": {
+        "en": "Risk Score"
+      },
+      "example": 75
+    },
+    {
+      "name": "risk_level",
+      "type": "string",
+      "title": {
+        "en": "Risk Level"
+      },
+      "example": "High"
+    },
+    {
+      "name": "recommendation",
+      "type": "string",
+      "title": {
+        "en": "Recommendation"
+      },
+      "example": "Reduce non-essential power usage for next 3 hours"
+    }
+  ]
+} 

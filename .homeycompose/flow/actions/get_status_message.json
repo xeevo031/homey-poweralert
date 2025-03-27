@@ -1,0 +1,22 @@
+{
+  "id": "get_status_message",
+  "title": {
+    "en": "Get Status Message"
+  },
+  "hint": {
+    "en": "Get the current detailed status message"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ],
+  "returns": {
+    "type": "string",
+    "title": {
+      "en": "Status Message"
+    }
+  }
+} 

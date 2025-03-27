@@ -1,0 +1,75 @@
+{
+  "id": "get_optimal_energy_period",
+  "title": {
+    "en": "Get Optimal Energy Period"
+  },
+  "titleFormatted": {
+    "en": "Find optimal [[duration]] minute period between [[start_time]] and [[end_time]]"
+  },
+  "hint": {
+    "en": "Returns the best time period for energy-intensive activities based on forecast demand"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "title": {
+        "en": "Duration (minutes)"
+      },
+      "min": 30,
+      "max": 360,
+      "step": 30
+    },
+    {
+      "name": "start_time",
+      "type": "text",
+      "title": {
+        "en": "Start Time (HH:MM)"
+      },
+      "placeholder": {
+        "en": "06:00"
+      }
+    },
+    {
+      "name": "end_time",
+      "type": "text",
+      "title": {
+        "en": "End Time (HH:MM)"
+      },
+      "placeholder": {
+        "en": "22:00"
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "name": "optimal_start",
+      "type": "string",
+      "title": {
+        "en": "Optimal Start Time"
+      },
+      "example": "14:30"
+    },
+    {
+      "name": "average_demand",
+      "type": "number",
+      "title": {
+        "en": "Average Demand"
+      },
+      "example": 25000
+    },
+    {
+      "name": "system_color",
+      "type": "string",
+      "title": {
+        "en": "System Color"
+      },
+      "example": "Green"
+    }
+  ]
+} 

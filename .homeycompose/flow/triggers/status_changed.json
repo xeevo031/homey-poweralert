@@ -1,0 +1,227 @@
+{
+  "id": "status_changed",
+  "title": {
+    "en": "System Status Changed"
+  },
+  "titleFormatted": {
+    "en": "System status changed: Color [[previous_color]] → [[current_color]], Direction [[previous_direction]] → [[current_direction]], Trend [[previous_trend]] → [[current_trend]]"
+  },
+  "hint": {
+    "en": "When any system status changes (color, direction, trend)"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_color",
+      "type": "dropdown",
+      "title": {
+        "en": "Previous Color"
+      },
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    },
+    {
+      "name": "current_color",
+      "type": "dropdown",
+      "title": {
+        "en": "Current Color"
+      },
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    },
+    {
+      "name": "previous_direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Previous Direction"
+      },
+      "values": [
+        {
+          "id": "up",
+          "title": {
+            "en": "Up"
+          }
+        },
+        {
+          "id": "down",
+          "title": {
+            "en": "Down"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    },
+    {
+      "name": "current_direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Current Direction"
+      },
+      "values": [
+        {
+          "id": "up",
+          "title": {
+            "en": "Up"
+          }
+        },
+        {
+          "id": "down",
+          "title": {
+            "en": "Down"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    },
+    {
+      "name": "previous_trend",
+      "type": "dropdown",
+      "title": {
+        "en": "Previous Trend"
+      },
+      "values": [
+        {
+          "id": "increasing",
+          "title": {
+            "en": "Increasing"
+          }
+        },
+        {
+          "id": "decreasing",
+          "title": {
+            "en": "Decreasing"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    },
+    {
+      "name": "current_trend",
+      "type": "dropdown",
+      "title": {
+        "en": "Current Trend"
+      },
+      "values": [
+        {
+          "id": "increasing",
+          "title": {
+            "en": "Increasing"
+          }
+        },
+        {
+          "id": "decreasing",
+          "title": {
+            "en": "Decreasing"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "previous_color",
+      "type": "string",
+      "title": {
+        "en": "Previous color"
+      }
+    },
+    {
+      "name": "current_color",
+      "type": "string",
+      "title": {
+        "en": "Current color"
+      }
+    },
+    {
+      "name": "previous_direction",
+      "type": "string",
+      "title": {
+        "en": "Previous direction"
+      }
+    },
+    {
+      "name": "current_direction",
+      "type": "string",
+      "title": {
+        "en": "Current direction"
+      }
+    },
+    {
+      "name": "previous_trend",
+      "type": "string",
+      "title": {
+        "en": "Previous trend"
+      }
+    },
+    {
+      "name": "current_trend",
+      "type": "string",
+      "title": {
+        "en": "Current trend"
+      }
+    }
+  ],
+  "icon": "info",
+  "category": "system_status"
+} 

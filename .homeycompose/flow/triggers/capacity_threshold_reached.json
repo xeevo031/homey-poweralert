@@ -1,0 +1,119 @@
+{
+  "id": "capacity_threshold_reached",
+  "title": {
+    "en": "Capacity Threshold Reached"
+  },
+  "titleFormatted": {
+    "en": "Power capacity [[direction]] threshold of [[threshold]] MW (current: [[current_capacity]] MW)"
+  },
+  "hint": {
+    "en": "Triggered when the power capacity crosses a configured threshold"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold Value (MW)"
+      },
+      "example": 45000
+    },
+    {
+      "name": "current_capacity",
+      "type": "number",
+      "title": {
+        "en": "Current Capacity (MW)"
+      },
+      "example": 42000
+    },
+    {
+      "name": "previous_capacity",
+      "type": "number",
+      "title": {
+        "en": "Previous Capacity (MW)"
+      },
+      "example": 48000
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "title": {
+        "en": "Direction"
+      },
+      "example": "below"
+    },
+    {
+      "name": "time_until_recovery",
+      "type": "number",
+      "title": {
+        "en": "Expected Time Until Recovery (minutes)"
+      },
+      "example": 240
+    },
+    {
+      "name": "rate_of_change",
+      "type": "number",
+      "title": {
+        "en": "Rate of Change (MW/hour)"
+      },
+      "example": -600
+    },
+    {
+      "name": "historical_comparison",
+      "type": "string",
+      "title": {
+        "en": "Historical Comparison"
+      },
+      "example": "15% lower than typical Tuesday"
+    },
+    {
+      "name": "trend_direction",
+      "type": "string",
+      "title": {
+        "en": "Trend Direction"
+      },
+      "example": "decreasing"
+    },
+    {
+      "name": "confidence_level",
+      "type": "number",
+      "title": {
+        "en": "Forecast Confidence Level (%)"
+      },
+      "example": 85
+    },
+    {
+      "name": "max_available_capacity",
+      "type": "number",
+      "title": {
+        "en": "Maximum Available Capacity (MW)"
+      },
+      "example": 50000
+    },
+    {
+      "name": "reserve_margin",
+      "type": "number",
+      "title": {
+        "en": "Reserve Margin (MW)"
+      },
+      "example": 8000
+    },
+    {
+      "name": "reserve_percentage",
+      "type": "number",
+      "title": {
+        "en": "Reserve Percentage (%)"
+      },
+      "example": 19
+    }
+  ],
+  "icon": "gauge",
+  "category": "power_metrics"
+} 

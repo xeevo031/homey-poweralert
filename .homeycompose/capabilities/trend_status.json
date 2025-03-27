@@ -1,0 +1,33 @@
+{
+  "id": "trend_status",
+  "type": "string",
+  "title": {
+    "en": "Trend Status"
+  },
+  "desc": {
+    "en": "Current trend of the power system (increasing/decreasing/stable)"
+  },
+  "getable": true,
+  "setable": false,
+  "icon": "/assets/trend.svg",
+  "values": [
+    {
+      "id": "increasing",
+      "title": {
+        "en": "Increasing"
+      }
+    },
+    {
+      "id": "decreasing",
+      "title": {
+        "en": "Decreasing"
+      }
+    },
+    {
+      "id": "stable",
+      "title": {
+        "en": "Stable"
+      }
+    }
+  ]
+} 

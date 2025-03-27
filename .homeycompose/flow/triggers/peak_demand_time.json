@@ -1,0 +1,45 @@
+{
+  "id": "peak_demand_time",
+  "title": {
+    "en": "Peak Demand Time"
+  },
+  "titleFormatted": {
+    "en": "Peak demand time identified"
+  },
+  "hint": {
+    "en": "Triggers when the forecasted peak demand time is identified"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "peak_time",
+      "type": "string",
+      "title": {
+        "en": "Peak Time"
+      },
+      "example": "18:00"
+    },
+    {
+      "name": "peak_demand",
+      "type": "number",
+      "title": {
+        "en": "Peak Demand"
+      },
+      "example": 35000
+    },
+    {
+      "name": "system_color",
+      "type": "string",
+      "title": {
+        "en": "System Color"
+      },
+      "example": "Red"
+    }
+  ]
+} 

@@ -7,26 +7,245 @@
     "local"
   ],
   "name": {
-    "en": "Power Alert"
+    "en": "PowerAlert"
   },
   "description": {
-    "en": "Power Alert converts electricity demand data into status levels which are then communicated to the public. The Power Alert makes use of real-time data and takes into account historical loads, current real-time loads, weather conditions, supply and network conditions"
+    "en": "Monitor the South African power grid status in real-time"
   },
   "category": "energy",
   "permissions": [],
   "brandColor": "#114590",
    "images": {
-    "small": "assets/images/small.png",
-    "large": "assets/images/large.png",
-    "xlarge": "assets/images/xlarge.png"
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png", 
+    "xlarge": "/assets/images/xlarge.png" 
+  },
+  "author": {
+    "name": "Neil Donnelly",
+    "email": "neil@xeevo.co.za"
   },
   "bugs": {
     "url": "https://github.com/xeevo031/homey-poweralert/issues"
   },
   "source": "https://github.com/xeevo031/homey-poweralert",
-
-  "author": {
-    "name": "Neil Donnelly",
-    "email": "neil@xeevo.co.za"
+  "capabilities": [],
+  "settings": [
+    {
+      "type": "group",
+      "id": "general",
+      "title": {
+        "en": "General Settings"
+      },
+      "children": [
+        {
+          "id": "update_interval",
+          "type": "number",
+          "title": {
+            "en": "Update Interval"
+          },
+          "value": 5,
+          "min": 1,
+          "max": 60,
+          "units": "minutes",
+          "hint": {
+            "en": "How often to update data from PowerAlert (1-60 minutes)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "id": "thresholds",
+      "title": {
+        "en": "Threshold Settings"
+      },
+      "children": [
+        {
+          "id": "margin_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Margin Thresholds"
+          },
+          "value": "1000,2000,3000,4000,5000,10000,15000,20000",
+          "hint": {
+            "en": "Comma-separated list of margin thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "demand_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Demand Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of demand thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "capacity_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Capacity Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of capacity thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "critical_margin",
+          "type": "number",
+          "title": {
+            "en": "Critical Margin"
+          },
+          "value": 500,
+          "min": 0,
+          "max": 5000,
+          "units": "MW",
+          "hint": {
+            "en": "Margin below which the system is considered critical"
+          }
+        },
+        {
+          "id": "high_utilization",
+          "type": "number",
+          "title": {
+            "en": "High Utilization Threshold"
+          },
+          "value": 90,
+          "min": 0,
+          "max": 100,
+          "units": "%",
+          "hint": {
+            "en": "Utilization percentage above which the system is considered at high risk"
+          }
+        },
+        {
+          "id": "stable_margin",
+          "type": "number",
+          "title": {
+            "en": "Stable Margin"
+          },
+          "value": 3000,
+          "min": 0,
+          "max": 10000,
+          "units": "MW",
+          "hint": {
+            "en": "Margin above which the system is considered stable"
+          }
+        }
+      ]
+    }
+  ],
+  "drivers": [
+    {
+      "id": "powerstatus",
+      "name": {
+        "en": "Power Status"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "power_probability",
+        "peak_demand",
+        "available_capacity",
+        "lowest_margin",
+        "last_updated",
+        "average_capacity",
+        "current_load_forecast",
+        "current_declared_availability",
+        "trend_status",
+        "system_direction",
+        "current_max_availability",
+        "average_max_availability",
+        "max_max_availability",
+        "min_max_availability",
+        "max_load_forecast",
+        "min_load_forecast",
+        "max_declared_availability",
+        "min_declared_availability",
+        "average_margin",
+        "average_demand",
+        "system_color",
+        "status_message",
+        "color_changes"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "internet"
+      ],
+      "images": {
+        "small": "/drivers/powerstatus/assets/images/small.png",
+        "large": "/drivers/powerstatus/assets/images/large.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "options": {
+            "singular": true
+          },
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    }
+  ],
+  "widgets": {
+    "forecast-mini": {
+      "name": {
+        "en": "Forecast Mini"
+      },
+      "height": 268,
+      "transparent": false,
+      "settings": [
+        {
+          "id": "showUpdated",
+          "type": "checkbox",
+          "title": {
+            "en": "Show Last Updated Time"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getForecast": {
+          "method": "GET",
+          "path": "/forecast"
+        }
+      },
+      "id": "forecast-mini"
+    },
+    "probability-gauge": {
+      "name": {
+        "en": "Probability Gauge"
+      },
+      "height": 300,
+      "transparent": false,
+      "settings": [
+        {
+          "id": "showLastUpdate",
+          "type": "checkbox",
+          "title": {
+            "en": "Show Last Update Time"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getProbabilities": {
+          "method": "GET",
+          "path": "/probabilities"
+        }
+      },
+      "id": "probability-gauge"
+    }
   }
 }

@@ -1,0 +1,46 @@
+{
+  "id": "status_trending_direction",
+  "title": {
+    "en": "Status Trending Direction"
+  },
+  "titleFormatted": {
+    "en": "Status is !{{trending|not trending}} [[direction]]"
+  },
+  "hint": {
+    "en": "Check if the overall system status is trending in a specific direction"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Trend Direction"
+      },
+      "values": [
+        {
+          "id": "improving",
+          "title": {
+            "en": "Improving"
+          }
+        },
+        {
+          "id": "worsening",
+          "title": {
+            "en": "Worsening"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    }
+  ]
+} 

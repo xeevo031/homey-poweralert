@@ -1,0 +1,62 @@
+{
+  "id": "status_duration_exceeded",
+  "title": {
+    "en": "Status Duration Exceeded"
+  },
+  "titleFormatted": {
+    "en": "System has been [[status]] for [[duration]] minutes"
+  },
+  "hint": {
+    "en": "Triggers when the system has been in a specific status for a set duration"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "status",
+      "type": "dropdown",
+      "title": {
+        "en": "Status Color"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "title": {
+        "en": "Duration (minutes)"
+      },
+      "min": 5,
+      "max": 1440,
+      "step": 5
+    }
+  ]
+} 

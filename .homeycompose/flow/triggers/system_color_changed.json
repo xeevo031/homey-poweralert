@@ -1,0 +1,174 @@
+{
+  "id": "system_color_changed",
+  "title": {
+    "en": "System Color Changed"
+  },
+  "titleFormatted": {
+    "en": "System color changed from [[previous_color]] to [[current_color]]"
+  },
+  "hint": {
+    "en": "Triggered when the system color changes"
+  },
+  "platforms": [
+    "local"
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_color",
+      "type": "dropdown",
+      "title": {
+        "en": "Previous Color"
+      },
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    },
+    {
+      "name": "current_color",
+      "type": "dropdown",
+      "title": {
+        "en": "Current Color"
+      },
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "previous_duration",
+      "type": "string",
+      "title": {
+        "en": "Previous Duration"
+      },
+      "example": "2 hours"
+    },
+    {
+      "name": "change_type",
+      "type": "string",
+      "title": {
+        "en": "Change Type"
+      },
+      "example": "Improvement"
+    },
+    {
+      "name": "forecast_stability",
+      "type": "string",
+      "title": {
+        "en": "Forecast Stability"
+      },
+      "example": "Stable for next 4 hours"
+    },
+    {
+      "name": "next_change_forecast",
+      "type": "string",
+      "title": {
+        "en": "Next Change Forecast"
+      },
+      "example": "Expected to change in 3 hours"
+    },
+    {
+      "name": "margin_change",
+      "type": "string",
+      "title": {
+        "en": "Margin Change"
+      },
+      "example": "Increased by 500 MW"
+    },
+    {
+      "name": "utilization_change",
+      "type": "string",
+      "title": {
+        "en": "Utilization Change"
+      },
+      "example": "Decreased by 5%"
+    },
+    {
+      "name": "color_frequency_today",
+      "type": "string",
+      "title": {
+        "en": "Color Frequency Today"
+      },
+      "example": "3rd time today (25% of the day)"
+    },
+    {
+      "name": "typical_duration",
+      "type": "string",
+      "title": {
+        "en": "Typical Duration"
+      },
+      "example": "Usually lasts 4 hours"
+    },
+    {
+      "name": "time_pattern",
+      "type": "string",
+      "title": {
+        "en": "Time Pattern"
+      },
+      "example": "Common for this time (occurs 75% of days at this hour)"
+    },
+    {
+      "name": "recent_instability",
+      "type": "string",
+      "title": {
+        "en": "Recent Instability"
+      },
+      "example": "5 changes in last 24h (above average)"
+    },
+    {
+      "name": "historical_context",
+      "type": "string",
+      "title": {
+        "en": "Historical Context"
+      },
+      "example": "Margin 20% above typical for this time"
+    },
+    {
+      "name": "recovery_forecast",
+      "type": "string",
+      "title": {
+        "en": "Recovery Forecast"
+      },
+      "example": "Typically recovers to green within 2-4 hours"
+    }
+  ]
+} 

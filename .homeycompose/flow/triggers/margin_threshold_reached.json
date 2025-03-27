@@ -1,0 +1,95 @@
+{
+  "id": "margin_threshold_reached",
+  "title": {
+    "en": "Margin Threshold Reached"
+  },
+  "titleFormatted": {
+    "en": "Power margin [[direction]] threshold of [[threshold]] MW (current: [[current_margin]] MW)"
+  },
+  "hint": {
+    "en": "Triggered when the power margin crosses a configured threshold"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold Value (MW)"
+      },
+      "example": 5000
+    },
+    {
+      "name": "current_margin",
+      "type": "number",
+      "title": {
+        "en": "Current Margin (MW)"
+      },
+      "example": 4800
+    },
+    {
+      "name": "previous_margin",
+      "type": "number",
+      "title": {
+        "en": "Previous Margin (MW)"
+      },
+      "example": 5200
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "title": {
+        "en": "Direction"
+      },
+      "example": "below"
+    },
+    {
+      "name": "time_until_recovery",
+      "type": "number",
+      "title": {
+        "en": "Expected Time Until Recovery (minutes)"
+      },
+      "example": 120
+    },
+    {
+      "name": "rate_of_change",
+      "type": "number",
+      "title": {
+        "en": "Rate of Change (MW/hour)"
+      },
+      "example": -200
+    },
+    {
+      "name": "historical_comparison",
+      "type": "string",
+      "title": {
+        "en": "Historical Comparison"
+      },
+      "example": "15% worse than typical Tuesday"
+    },
+    {
+      "name": "trend_direction",
+      "type": "string",
+      "title": {
+        "en": "Trend Direction"
+      },
+      "example": "deteriorating"
+    },
+    {
+      "name": "confidence_level",
+      "type": "number",
+      "title": {
+        "en": "Forecast Confidence Level (%)"
+      },
+      "example": 85
+    }
+  ],
+  "icon": "gauge",
+  "category": "power_metrics"
+} 

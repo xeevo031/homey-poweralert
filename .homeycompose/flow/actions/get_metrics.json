@@ -1,0 +1,71 @@
+{
+  "id": "get_metrics",
+  "title": {
+    "en": "Get Power Metrics"
+  },
+  "titleFormatted": {
+    "en": "Get [[metric]] value"
+  },
+  "hint": {
+    "en": "Get specific power system metrics"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "metric",
+      "type": "dropdown",
+      "title": {
+        "en": "Metric"
+      },
+      "values": [
+        {
+          "id": "margin",
+          "title": {
+            "en": "Power Margin"
+          }
+        },
+        {
+          "id": "demand",
+          "title": {
+            "en": "Power Demand"
+          }
+        },
+        {
+          "id": "capacity",
+          "title": {
+            "en": "Available Capacity"
+          }
+        },
+        {
+          "id": "utilization",
+          "title": {
+            "en": "System Utilization"
+          }
+        },
+        {
+          "id": "reserve_margin",
+          "title": {
+            "en": "Reserve Margin"
+          }
+        }
+      ]
+    }
+  ],
+  "returns": {
+    "type": "number",
+    "title": {
+      "en": "Value"
+    },
+    "units": {
+      "margin": "MW",
+      "demand": "MW",
+      "capacity": "MW",
+      "utilization": "%",
+      "reserve_margin": "%"
+    }
+  }
+} 

@@ -1,0 +1,19 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Average Capacity"
+  },
+  "desc": {
+    "en": "Average available power capacity in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "units": "MW",
+  "decimals": 0,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg"
+} 

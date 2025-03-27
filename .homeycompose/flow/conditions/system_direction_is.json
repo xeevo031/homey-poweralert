@@ -1,0 +1,43 @@
+{
+  "id": "system_direction_is",
+  "title": {
+    "en": "System direction !{{is|is not}}"
+  },
+  "titleFormatted": {
+    "en": "System direction !{{is|is not}} [[direction]]"
+  },
+  "hint": {
+    "en": "Check if the current system direction matches the specified value."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "direction",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "up",
+          "title": {
+            "en": "Up"
+          }
+        },
+        {
+          "id": "down",
+          "title": {
+            "en": "Down"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    }
+  ]
+} 

@@ -26,46 +26,48 @@ module.exports = {
     return homey.app.deleteSomething(params.id);
   },
 
-  async getStage({ homey }) {
+  async getForecast({ homey }) {
     try {
-      // Get the driver directly
+      // Get the driver
       const driver = await homey.drivers.getDriver('powerstatus');
       if (!driver) {
-        return {
-          stage: 0,
-          description: 'PowerStatus driver not found',
-          lastUpdate: new Date().toISOString()
-        };
+        throw new Error('PowerStatus driver not found');
       }
 
-      // Get all devices for this driver
+      // Get the device
       const devices = await driver.getDevices();
       const powerStatusDevice = devices[0];
-
       if (!powerStatusDevice) {
-        return {
-          stage: 0,
-          description: 'No PowerStatus device found',
-          lastUpdate: new Date().toISOString()
-        };
+        throw new Error('No PowerStatus device found');
       }
 
-      // Get the current stage and status
-      const stage = powerStatusDevice.getCapabilityValue('loadshedding_stage');
-      const statusMessage = powerStatusDevice.getCapabilityValue('status_message');
+      // Get the current values
+      const peakDemand = powerStatusDevice.getCapabilityValue('peak_demand');
+      const lowestMargin = powerStatusDevice.getCapabilityValue('lowest_margin');
       const lastUpdated = powerStatusDevice.getCapabilityValue('last_updated');
+
+      // Get forecast data from device's detailed forecast
+      const detailedForecast = await powerStatusDevice.fetchDetailedForecast();
       
+      // Map forecast data to hourly margins
+      const hourlyMargins = detailedForecast ? detailedForecast.map(point => ({
+        hour: new Date(point.Timestamp).getHours(),
+        margin: point.Margin || 0
+      })) : [];
+
       return {
-        stage: stage || 0,
-        description: statusMessage || 'No status available',
-        lastUpdate: lastUpdated || new Date().toISOString()
+        peakDemand: Math.round(peakDemand) || 0,
+        lowestMargin: Math.round(lowestMargin) || 0,
+        lastUpdate: lastUpdated || new Date().toISOString(),
+        forecast: hourlyMargins
       };
     } catch (error) {
-      console.error('Error getting stage:', error);
+      console.error('Error getting forecast:', error);
       return {
-        stage: 0,
-        description: 'Error: ' + error.message,
-        lastUpdate: new Date().toISOString()
+        peakDemand: 0,
+        lowestMargin: 0,
+        lastUpdate: new Date().toISOString(),
+        forecast: []
       };
     }
   }

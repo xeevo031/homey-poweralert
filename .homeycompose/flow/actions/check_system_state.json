@@ -1,0 +1,58 @@
+{
+  "id": "check_system_state",
+  "title": {
+    "en": "Check System State"
+  },
+  "titleFormatted": {
+    "en": "Check if system is in [[state]] state"
+  },
+  "hint": {
+    "en": "Check if the system is in a specific state"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "state",
+      "type": "dropdown",
+      "title": {
+        "en": "State"
+      },
+      "values": [
+        {
+          "id": "critical",
+          "title": {
+            "en": "Critical"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        },
+        {
+          "id": "improving",
+          "title": {
+            "en": "Improving"
+          }
+        },
+        {
+          "id": "high_utilization",
+          "title": {
+            "en": "High Utilization"
+          }
+        }
+      ]
+    }
+  ],
+  "returns": {
+    "type": "boolean",
+    "title": {
+      "en": "Is in State"
+    }
+  }
+} 

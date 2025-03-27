@@ -1,0 +1,20 @@
+{
+  "id": "average_max_availability",
+  "type": "number",
+  "title": {
+    "en": "Average Maximum Availability"
+  },
+  "desc": {
+    "en": "Average maximum available power capacity in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 

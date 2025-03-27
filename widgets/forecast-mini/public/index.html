@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Forecast Mini</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: var(--homey-font-primary);
+      }
+
+      body {
+        background: var(--homey-color-background);
+        color: var(--homey-color-text);
+        padding: 12px;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 8px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0;
+        padding: 4px 0;
+      }
+
+      .title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--homey-color-text-subtle);
+      }
+
+      .chart-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: flex-end;
+        gap: 1px;
+        min-height: 100px;
+        padding: 4px 0 20px 0;
+        position: relative;
+        margin: 4px 0;
+      }
+
+      .chart-bar {
+        flex: 1;
+        min-height: 40px;
+        max-height: 100px;
+        transition: all 0.3s ease;
+        position: relative;
+        opacity: 0.9;
+      }
+
+      .chart-bar:hover {
+        opacity: 1;
+      }
+
+      .chart-bar::after {
+        content: attr(data-hour);
+        position: absolute;
+        bottom: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        color: var(--homey-color-text-subtle);
+        opacity: 0;
+      }
+
+      .chart-bar:nth-child(3n+1)::after {
+        opacity: 1;
+      }
+
+      .chart-grid {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 4px;
+        bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+
+      .grid-line {
+        border-top: 1px solid var(--homey-color-border);
+        width: 100%;
+        opacity: 0.2;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      .metric {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .metric-label {
+        font-size: 12px;
+        color: var(--homey-color-text-subtle);
+        font-weight: 500;
+      }
+
+      .metric-value {
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .metric-unit {
+        font-size: 11px;
+        color: var(--homey-color-text-subtle);
+      }
+
+      .last-update {
+        font-size: 11px;
+        color: var(--homey-color-text-subtle);
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      /* Power status colors */
+      .status-green { background: #4CAF50; }
+      .status-orange { background: #FF9800; }
+      .status-red { background: #F44336; }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div class="container">
+      <div class="header">
+        <div class="title">Power Forecast</div>
+      </div>
+
+      <div class="chart-container" id="chart">
+        <div class="chart-grid">
+          <div class="grid-line"></div>
+          <div class="grid-line"></div>
+          <div class="grid-line"></div>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Peak Demand</div>
+          <div>
+            <span class="metric-value" id="peak-demand">0</span>
+            <span class="metric-unit">MW</span>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Lowest Margin</div>
+          <div>
+            <span class="metric-value" id="lowest-margin">0</span>
+            <span class="metric-unit">MW</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="last-update" id="last-update"></div>
+    </div>
+
+    <script type="text/javascript">
+      function onHomeyReady(Homey) {
+        Homey.ready();
+
+        const settings = Homey.getSettings();
+        const lastUpdate = document.getElementById('last-update');
+
+        // Show/hide last update based on settings
+        if (settings.showUpdated === false) {
+          lastUpdate.style.display = 'none';
+        }
+
+        // Function to format time as HH:MM
+        function formatTime(isoString) {
+          try {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit'
+            });
+          } catch (e) {
+            return '';
+          }
+        }
+
+        // Format number with thousand separator
+        function formatNumber(num) {
+          return Math.round(num).toLocaleString('en');
+        }
+
+        function getStatusColor(margin) {
+          if (margin > 3000) return 'status-green';
+          if (margin > 1000) return 'status-orange';
+          return 'status-red';
+        }
+
+        function createChartBars(forecast) {
+          const chart = document.getElementById('chart');
+          // Keep the grid div and clear only the bars
+          const bars = chart.querySelectorAll('.chart-bar');
+          bars.forEach(bar => bar.remove());
+          
+          const chartGrid = chart.querySelector('.chart-grid');
+          // Clear the chart except for the grid
+          while (chart.firstChild) {
+            if (chart.firstChild === chartGrid) {
+              break;
+            }
+            chart.removeChild(chart.firstChild);
+          }
+          
+          forecast.forEach(point => {
+            const bar = document.createElement('div');
+            bar.className = `chart-bar ${getStatusColor(point.margin)}`;
+            // Scale height based on margin
+            const height = Math.max(40, Math.min(100, 40 + (point.margin / 100)));
+            bar.style.height = `${height}px`;
+            // Add hour marker
+            const hour = point.hour.toString().padStart(2, '0');
+            bar.setAttribute('data-hour', `${hour}:00`);
+            // Add tooltip with more detail
+            bar.title = `${hour}:00 - Margin: ${formatNumber(point.margin)} MW`;
+            chart.appendChild(bar);
+          });
+        }
+
+        async function updateWidget() {
+          try {
+            const result = await Homey.api('GET', '/forecast');
+            console.log('Forecast API response:', result);
+            
+            // Update metrics
+            document.getElementById('peak-demand').textContent = formatNumber(result.peakDemand);
+            document.getElementById('lowest-margin').textContent = formatNumber(result.lowestMargin);
+            
+            // Update chart
+            if (Array.isArray(result.forecast)) {
+              createChartBars(result.forecast);
+            }
+            
+            // Update last updated time if enabled
+            if (settings.showUpdated !== false) {
+              lastUpdate.textContent = `Updated: ${formatTime(result.lastUpdate)}`;
+            }
+          } catch (error) {
+            console.error('Error updating widget:', error);
+          }
+        }
+
+        // Initial update
+        updateWidget();
+        
+        // Update every minute
+        setInterval(updateWidget, 60 * 1000);
+
+        // Listen for settings changes
+        Homey.on('settings_changed', (newSettings) => {
+          if (newSettings.showUpdated !== settings.showUpdated) {
+            lastUpdate.style.display = newSettings.showUpdated ? 'block' : 'none';
+            if (newSettings.showUpdated) {
+              updateWidget();
+            }
+          }
+          Object.assign(settings, newSettings);
+        });
+      }
+    </script>
+  </body>
+</html>

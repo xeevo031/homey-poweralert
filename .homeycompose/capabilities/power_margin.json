@@ -1,0 +1,23 @@
+{
+  "id": "power_margin",
+  "type": "number",
+  "title": {
+    "en": "Power Margin"
+  },
+  "desc": {
+    "en": "The difference between available capacity and current load forecast"
+  },
+  "insights": true,
+  "insightsTitleTrue": {
+    "en": "Power Margin"
+  },
+  "units": {
+    "en": "MW"
+  },
+  "decimals": 0,
+  "chartType": "line",
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/margin.svg"
+} 

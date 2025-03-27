@@ -1,0 +1,20 @@
+{
+  "id": "min_declared_availability",
+  "type": "number",
+  "title": {
+    "en": "Minimum Declared Availability"
+  },
+  "desc": {
+    "en": "Minimum available power capacity in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "units": "MW",
+  "decimals": 0,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg"
+} 

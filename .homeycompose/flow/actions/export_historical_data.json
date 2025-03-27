@@ -1,0 +1,132 @@
+{
+  "id": "export_historical_data",
+  "title": {
+    "en": "Export Historical Data"
+  },
+  "titleFormatted": {
+    "en": "Export last [[hours]] hours of power data as [[format]]"
+  },
+  "hint": {
+    "en": "Exports historical power data for analysis or reporting. Use with email or other actions to send the data."
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "hours",
+      "type": "number",
+      "title": {
+        "en": "Hours of History"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    },
+    {
+      "name": "format",
+      "type": "dropdown",
+      "title": {
+        "en": "Export Format"
+      },
+      "values": [
+        {
+          "id": "csv",
+          "title": {
+            "en": "CSV"
+          }
+        },
+        {
+          "id": "json",
+          "title": {
+            "en": "JSON"
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "content",
+      "type": "string",
+      "title": {
+        "en": "Export Content"
+      },
+      "example": "Timestamp,Color,Direction,Demand,Capacity,MaxAvailability,Margin\n2024-03-26 14:00:00,green,stable,35000,45000,50000,10000"
+    },
+    {
+      "name": "mime_type",
+      "type": "string",
+      "title": {
+        "en": "MIME Type"
+      },
+      "example": "text/csv"
+    },
+    {
+      "name": "filename",
+      "type": "string",
+      "title": {
+        "en": "Filename"
+      },
+      "example": "power-alert-export-2024-03-26-14-00-00.csv"
+    },
+    {
+      "name": "record_count",
+      "type": "number",
+      "title": {
+        "en": "Record Count"
+      },
+      "example": 24
+    },
+    {
+      "name": "export_time",
+      "type": "string",
+      "title": {
+        "en": "Export Time"
+      },
+      "example": "2024-03-26 14:00:00"
+    },
+    {
+      "name": "start_time",
+      "type": "string",
+      "title": {
+        "en": "Data Start Time"
+      },
+      "example": "2024-03-26 00:00:00"
+    },
+    {
+      "name": "end_time",
+      "type": "string",
+      "title": {
+        "en": "Data End Time"
+      },
+      "example": "2024-03-26 23:00:00"
+    },
+    {
+      "name": "color_changes",
+      "type": "number",
+      "title": {
+        "en": "Number of Color Changes"
+      },
+      "example": 3
+    },
+    {
+      "name": "average_demand",
+      "type": "number",
+      "title": {
+        "en": "Average Demand"
+      },
+      "example": 35000
+    },
+    {
+      "name": "average_margin",
+      "type": "number",
+      "title": {
+        "en": "Average Margin"
+      },
+      "example": 10000
+    }
+  ]
+} 

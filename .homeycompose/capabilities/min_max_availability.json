@@ -1,0 +1,20 @@
+{
+  "id": "min_max_availability",
+  "type": "number",
+  "title": {
+    "en": "Minimum Maximum Availability"
+  },
+  "desc": {
+    "en": "Minimum maximum available power capacity in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 

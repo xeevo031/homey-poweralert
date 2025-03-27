@@ -1,0 +1,20 @@
+{
+  "id": "average_demand",
+  "type": "number",
+  "title": {
+    "en": "Average Demand"
+  },
+  "desc": {
+    "en": "Average power demand forecast in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 

@@ -1,264 +1,225 @@
+<!DOCTYPE html>
 <html>
   <head>
     <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: var(--homey-font-primary);
+      }
+
+      body {
+        background: var(--homey-color-background);
+        color: var(--homey-color-text);
+        padding: 16px;
+      }
+
       .container {
         display: flex;
         flex-direction: column;
-        padding: var(--homey-su-2);
+        align-items: center;
+        gap: 16px;
         height: 100%;
-        box-sizing: border-box;
+        padding: 8px;
       }
 
-      .probability-bars {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        margin-bottom: var(--homey-su-2);
-      }
-
-      .probability-item {
-        display: flex;
-        flex-direction: column;
-        margin: var(--homey-su-1) 0;
-      }
-
-      .probability-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: var(--homey-font-size-small);
-        color: var(--homey-color-text);
-        margin-bottom: var(--homey-su-1);
-      }
-
-      .probability-value {
-        font-weight: 500;
-      }
-
-      .probability-bar-container {
-        width: 100%;
-        height: 12px;
-        background-color: var(--homey-color-gray-light);
-        border-radius: 6px;
-        overflow: hidden;
+      .gauge-container {
         position: relative;
+        width: 100%;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        margin: 16px 0;
       }
 
-      .probability-bar {
-        height: 100%;
-        width: 0;
-        transition: width 0.5s ease, background-color 0.5s ease;
+      canvas#gauge {
+        width: 240px;
+        height: 240px;
+        display: block;
       }
 
-      .stage-container {
-        text-align: center;
-        padding-top: var(--homey-su-2);
-        border-top: 1px solid var(--homey-color-gray-light);
-      }
-
-      .stage-label {
-        font-size: var(--homey-font-size-small);
-        color: var(--homey-color-text-light);
-        margin-bottom: var(--homey-su-1);
-      }
-
-      .stage-value {
-        font-size: var(--homey-font-size-large);
-        font-weight: bold;
+      .gauge-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        font-weight: 500;
         color: var(--homey-color-text);
-        margin-bottom: var(--homey-su-1);
       }
 
       .last-update {
-        font-size: var(--homey-font-size-small);
-        color: var(--homey-color-text-light);
-      }
-
-      /* Loading animation */
-      @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
-      .loading .probability-bar-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
-        animation: shimmer 1.5s infinite;
-      }
-
-      .error-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
+        font-size: 12px;
+        color: var(--homey-color-text-subtle);
         text-align: center;
-        color: var(--homey-color-text-light);
-        padding: var(--homey-su-4);
-      }
-
-      .error-icon {
-        font-size: 24px;
-        margin-bottom: var(--homey-su-2);
-        color: var(--homey-color-error);
-      }
-
-      /* Probability bar colors */
-      .probability-high {
-        background-color: var(--homey-color-danger);
-      }
-      .probability-medium-high {
-        background-color: var(--homey-color-orange);
-      }
-      .probability-medium {
-        background-color: var(--homey-color-warning);
-      }
-      .probability-low {
-        background-color: var(--homey-color-success);
+        margin-top: auto;
+        padding-bottom: 8px;
       }
     </style>
   </head>
 
   <body class="homey-widget">
-    <div class="container" id="mainContainer">
-      <div class="probability-bars" id="probabilityBars">
-        <!-- Probability bars will be added here -->
+    <div class="container">
+      <div class="gauge-container">
+        <canvas id="gauge" width="240" height="240"></canvas>
+        <div class="gauge-value" id="probability">0%</div>
       </div>
-      <div class="stage-container" id="stageContainer">
-        <div class="stage-label">Current Stage</div>
-        <div class="stage-value" id="stageValue">-</div>
-        <div class="last-update" id="lastUpdate"></div>
-      </div>
+      <div class="last-update" id="last-update"></div>
     </div>
 
     <script type="text/javascript">
+      let gauge = null;
+
+      function initGauge() {
+        const canvas = document.getElementById('gauge');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const radius = Math.min(width, height) / 2 * 0.7; // Larger radius for better visibility
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const startAngle = Math.PI * 0.75;
+        const endAngle = Math.PI * 2.25;
+
+        // Set up high DPI canvas
+        const dpr = window.devicePixelRatio || 1;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+
+        return {
+          canvas,
+          ctx,
+          width,
+          height,
+          radius,
+          centerX,
+          centerY,
+          startAngle,
+          endAngle
+        };
+      }
+
+      function drawGauge(probability) {
+        if (!gauge) gauge = initGauge();
+        const { ctx, width, height, radius, centerX, centerY, startAngle, endAngle } = gauge;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, width * 2, height * 2);
+
+        // Draw background arc
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.lineWidth = 16;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
+        ctx.stroke();
+
+        // Draw value arc
+        const valueAngle = startAngle + (endAngle - startAngle) * (probability / 100);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, valueAngle);
+        ctx.lineWidth = 16;
+        ctx.lineCap = 'round';
+        
+        // Color based on probability
+        let color;
+        if (probability <= 25) color = '#4CAF50';      // Green
+        else if (probability <= 50) color = '#FF9800'; // Orange
+        else if (probability <= 75) color = '#F44336'; // Red
+        else color = '#212121';                        // Black
+        
+        ctx.strokeStyle = color;
+        ctx.stroke();
+
+        // Draw tick marks (very subtle)
+        for (let i = 0; i <= 100; i += 25) {
+          const tickAngle = startAngle + (endAngle - startAngle) * (i / 100);
+          const innerRadius = radius - 10;
+          const outerRadius = radius + 10;
+          
+          ctx.beginPath();
+          ctx.moveTo(
+            centerX + innerRadius * Math.cos(tickAngle),
+            centerY + innerRadius * Math.sin(tickAngle)
+          );
+          ctx.lineTo(
+            centerX + outerRadius * Math.cos(tickAngle),
+            centerY + outerRadius * Math.sin(tickAngle)
+          );
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+          ctx.stroke();
+        }
+
+        // Draw tick labels with better positioning
+        ctx.font = '13px var(--homey-font-primary)';
+        ctx.fillStyle = 'var(--homey-color-text-subtle)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Position labels with manual adjustments for better layout
+        const labelPositions = [
+          { value: 0, angle: -0.75 * Math.PI },
+          { value: 25, angle: -0.25 * Math.PI },
+          { value: 50, angle: 0.25 * Math.PI },
+          { value: 75, angle: 0.75 * Math.PI },
+          { value: 100, angle: 1.25 * Math.PI }
+        ];
+        
+        labelPositions.forEach(({ value, angle }) => {
+          const labelRadius = radius + 24;
+          const x = centerX + labelRadius * Math.cos(angle);
+          const y = centerY + labelRadius * Math.sin(angle);
+          
+          // Adjust vertical position based on angle
+          const verticalOffset = Math.abs(angle) < Math.PI / 2 ? -2 : 2;
+          
+          ctx.fillText(`${value}%`, x, y + verticalOffset);
+        });
+      }
+
       function onHomeyReady(Homey) {
         Homey.ready();
         
         const settings = Homey.getSettings();
-        const mainContainer = document.getElementById('mainContainer');
-        const stageContainer = document.getElementById('stageContainer');
-        const lastUpdate = document.getElementById('lastUpdate');
         
-        // Show/hide stage based on settings
-        if (settings.showStage === false) {
-          stageContainer.style.display = 'none';
-        }
-
-        // Show/hide last update based on settings
-        if (settings.showLastUpdate === false) {
-          lastUpdate.style.display = 'none';
-        }
-
-        // Function to format time as HH:MM
-        function formatTime(dateString) {
-          const date = new Date(dateString);
-          return date.toLocaleTimeString('en-GB', { 
-            hour: '2-digit', 
-            minute: '2-digit'
-          });
-        }
-
-        function getColorClass(probability) {
-          if (probability <= 25) return 'probability-high';
-          if (probability <= 50) return 'probability-medium-high';
-          if (probability <= 75) return 'probability-medium';
-          return 'probability-low';
-        }
-
-        function showError(message) {
-          mainContainer.innerHTML = `
-            <div class="error-state">
-              <div class="error-icon">⚠️</div>
-              <div>${message}</div>
-            </div>
-          `;
-        }
-
-        function showLoading() {
-          const barsContainer = document.getElementById('probabilityBars');
-          barsContainer.classList.add('loading');
-        }
-
-        function hideLoading() {
-          const barsContainer = document.getElementById('probabilityBars');
-          barsContainer.classList.remove('loading');
-        }
-
-        function createProbabilityBar(data) {
-          const item = document.createElement('div');
-          item.className = 'probability-item';
-
-          const labelContainer = document.createElement('div');
-          labelContainer.className = 'probability-label';
-          
-          const label = document.createElement('span');
-          label.textContent = data.label;
-          
-          const value = document.createElement('span');
-          value.className = 'probability-value';
-          value.textContent = `${Math.round(data.probability)}%`;
-
-          labelContainer.appendChild(label);
-          labelContainer.appendChild(value);
-
-          const barContainer = document.createElement('div');
-          barContainer.className = 'probability-bar-container';
-
-          const bar = document.createElement('div');
-          bar.className = `probability-bar ${getColorClass(data.probability)}`;
-          
-          // Trigger reflow to enable animation
-          setTimeout(() => {
-            bar.style.width = `${data.probability}%`;
-          }, 50);
-
-          barContainer.appendChild(bar);
-          item.appendChild(labelContainer);
-          item.appendChild(barContainer);
-          return item;
+        function formatTime(isoString) {
+          try {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit'
+            });
+          } catch (e) {
+            return '';
+          }
         }
 
         async function updateWidget() {
           try {
-            showLoading();
             const result = await Homey.api('GET', '/probabilities');
             
-            if (!result || typeof result.current?.probability === 'undefined') {
-              throw new Error('Invalid data received');
-            }
-
-            // Clear existing bars
-            const barsContainer = document.getElementById('probabilityBars');
-            barsContainer.innerHTML = '';
+            const probability = document.getElementById('probability');
+            const lastUpdate = document.getElementById('last-update');
             
-            // Add probability bars
-            barsContainer.appendChild(createProbabilityBar(result.current));
-            barsContainer.appendChild(createProbabilityBar(result.evening));
-            barsContainer.appendChild(createProbabilityBar(result.tomorrow));
+            probability.textContent = `${Math.round(result.current.probability)}%`;
             
-            // Update stage
-            document.getElementById('stageValue').textContent = result.stage;
+            drawGauge(result.current.probability);
             
-            // Update last updated time if it should be shown
             if (settings.showLastUpdate !== false) {
-              document.getElementById('lastUpdate').textContent = `Last updated: ${formatTime(result.lastUpdate)}`;
+              lastUpdate.textContent = `Last updated: ${formatTime(result.lastUpdate)}`;
+              lastUpdate.style.display = 'block';
+            } else {
+              lastUpdate.style.display = 'none';
             }
-            
-            hideLoading();
           } catch (error) {
             console.error('Error updating widget:', error);
-            showError(error.message || 'Failed to load power status');
           }
         }
 
@@ -270,13 +231,11 @@
 
         // Listen for settings changes
         Homey.on('settings_changed', (newSettings) => {
-          if (newSettings.showStage !== settings.showStage) {
-            stageContainer.style.display = newSettings.showStage ? 'block' : 'none';
-          }
           if (newSettings.showLastUpdate !== settings.showLastUpdate) {
+            const lastUpdate = document.getElementById('last-update');
             lastUpdate.style.display = newSettings.showLastUpdate ? 'block' : 'none';
             if (newSettings.showLastUpdate) {
-              updateWidget(); // Refresh to show the time
+              updateWidget();
             }
           }
           Object.assign(settings, newSettings);

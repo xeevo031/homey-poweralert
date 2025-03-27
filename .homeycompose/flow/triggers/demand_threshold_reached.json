@@ -1,0 +1,111 @@
+{
+  "id": "demand_threshold_reached",
+  "title": {
+    "en": "Demand Threshold Reached"
+  },
+  "titleFormatted": {
+    "en": "Power demand [[direction]] threshold of [[threshold]] MW (current: [[current_demand]] MW)"
+  },
+  "hint": {
+    "en": "Triggered when the power demand crosses a configured threshold"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold Value (MW)"
+      },
+      "example": 40000
+    },
+    {
+      "name": "current_demand",
+      "type": "number",
+      "title": {
+        "en": "Current Demand (MW)"
+      },
+      "example": 42000
+    },
+    {
+      "name": "previous_demand",
+      "type": "number",
+      "title": {
+        "en": "Previous Demand (MW)"
+      },
+      "example": 38000
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "title": {
+        "en": "Direction"
+      },
+      "example": "above"
+    },
+    {
+      "name": "time_until_recovery",
+      "type": "number",
+      "title": {
+        "en": "Expected Time Until Recovery (minutes)"
+      },
+      "example": 180
+    },
+    {
+      "name": "rate_of_change",
+      "type": "number",
+      "title": {
+        "en": "Rate of Change (MW/hour)"
+      },
+      "example": 400
+    },
+    {
+      "name": "historical_comparison",
+      "type": "string",
+      "title": {
+        "en": "Historical Comparison"
+      },
+      "example": "10% higher than typical Tuesday"
+    },
+    {
+      "name": "trend_direction",
+      "type": "string",
+      "title": {
+        "en": "Trend Direction"
+      },
+      "example": "increasing"
+    },
+    {
+      "name": "confidence_level",
+      "type": "number",
+      "title": {
+        "en": "Forecast Confidence Level (%)"
+      },
+      "example": 85
+    },
+    {
+      "name": "peak_demand",
+      "type": "number",
+      "title": {
+        "en": "Peak Demand (MW)"
+      },
+      "example": 45000
+    },
+    {
+      "name": "utilization_percentage",
+      "type": "number",
+      "title": {
+        "en": "Current Utilization (%)"
+      },
+      "example": 95
+    }
+  ],
+  "icon": "gauge",
+  "category": "power_metrics"
+} 

@@ -17,7 +17,6 @@ module.exports = {
       }
 
       // Get the current values
-      const currentStage = powerStatusDevice.getCapabilityValue('loadshedding_stage');
       const currentProbability = powerStatusDevice.getCapabilityValue('power_probability');
       const lastUpdated = powerStatusDevice.getCapabilityValue('last_updated');
       
@@ -39,7 +38,6 @@ module.exports = {
           probability: tomorrowProbability || 0,
           label: 'Tomorrow'
         },
-        stage: currentStage || 0,
         lastUpdate: lastUpdated || new Date().toISOString()
       };
     } catch (error) {
@@ -48,7 +46,6 @@ module.exports = {
         current: { probability: 0, label: 'Current' },
         evening: { probability: 0, label: 'Evening' },
         tomorrow: { probability: 0, label: 'Tomorrow' },
-        stage: 0,
         lastUpdate: new Date().toISOString()
       };
     }

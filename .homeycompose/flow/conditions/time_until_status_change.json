@@ -1,0 +1,95 @@
+{
+  "id": "time_until_status_change",
+  "title": {
+    "en": "Time Until Status Change"
+  },
+  "titleFormatted": {
+    "en": "System !{{will|will not}} change from [[from_status]] to [[to_status]] within [[hours]] hours"
+  },
+  "hint": {
+    "en": "Check if a status change is expected within a specific time period"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "from_status",
+      "type": "dropdown",
+      "title": {
+        "en": "From Status"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    },
+    {
+      "name": "to_status",
+      "type": "dropdown",
+      "title": {
+        "en": "To Status"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    },
+    {
+      "name": "hours",
+      "type": "number",
+      "title": {
+        "en": "Hours"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+} 

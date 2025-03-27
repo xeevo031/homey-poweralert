@@ -1,10 +1,10 @@
 {
-  "id": "update_data",
+  "id": "system_stable",
   "title": {
-    "en": "Update Power Status Data"
+    "en": "System !{{is|is not}} stable"
   },
   "hint": {
-    "en": "Manually trigger an update of the power status data"
+    "en": "When the system has a comfortable margin (>3000MW) and stable demand"
   },
   "args": [
     {

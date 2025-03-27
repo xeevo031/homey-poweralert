@@ -1,0 +1,29 @@
+{
+  "id": "margin_above",
+  "title": {
+    "en": "Power margin !{{is|is not}} above"
+  },
+  "titleFormatted": {
+    "en": "Power margin !{{is|is not}} above [[threshold]] MW"
+  },
+  "hint": {
+    "en": "Check if the current power margin is above the specified threshold."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "min": 0,
+      "max": 50000,
+      "step": 100,
+      "title": {
+        "en": "Threshold (MW)"
+      }
+    }
+  ]
+} 

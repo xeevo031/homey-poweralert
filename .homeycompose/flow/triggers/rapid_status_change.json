@@ -1,0 +1,85 @@
+{
+  "id": "rapid_status_change",
+  "title": {
+    "en": "Rapid Status Change"
+  },
+  "titleFormatted": {
+    "en": "System status changed from [[from_status]] to [[to_status]]"
+  },
+  "hint": {
+    "en": "Triggers when the system status changes rapidly indicating potential grid instability"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "from_status",
+      "type": "dropdown",
+      "title": {
+        "en": "From Status"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    },
+    {
+      "name": "to_status",
+      "type": "dropdown",
+      "title": {
+        "en": "To Status"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    }
+  ]
+} 

@@ -1,0 +1,20 @@
+{
+  "id": "average_margin",
+  "type": "number",
+  "title": {
+    "en": "Average Margin"
+  },
+  "desc": {
+    "en": "Average power margin in MW"
+  },
+  "min": -50000,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/margin.svg",
+  "units": "MW",
+  "decimals": 0
+} 

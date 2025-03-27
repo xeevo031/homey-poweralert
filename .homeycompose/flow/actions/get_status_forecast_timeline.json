@@ -1,0 +1,55 @@
+{
+  "id": "get_status_forecast_timeline",
+  "title": {
+    "en": "Get Status Forecast Timeline"
+  },
+  "titleFormatted": {
+    "en": "Get status forecast timeline for next [[hours]] hours"
+  },
+  "hint": {
+    "en": "Returns a formatted timeline of forecasted status changes"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "hours",
+      "type": "number",
+      "title": {
+        "en": "Hours to Forecast"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ],
+  "tokens": [
+    {
+      "name": "timeline",
+      "type": "string",
+      "title": {
+        "en": "Timeline"
+      },
+      "example": "06:00-09:00: Green (Stable)\n09:00-12:00: Yellow (Increasing)"
+    },
+    {
+      "name": "status_changes",
+      "type": "number",
+      "title": {
+        "en": "Status Changes"
+      },
+      "example": 3
+    },
+    {
+      "name": "worst_period",
+      "type": "string",
+      "title": {
+        "en": "Worst Period"
+      },
+      "example": "18:00-21:00 (Red)"
+    }
+  ]
+} 

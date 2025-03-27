@@ -1,0 +1,33 @@
+{
+  "id": "system_direction",
+  "type": "string",
+  "title": {
+    "en": "System Direction"
+  },
+  "desc": {
+    "en": "Current system direction (up/down/stable)"
+  },
+  "getable": true,
+  "setable": false,
+  "icon": "/assets/direction.svg",
+  "values": [
+    {
+      "id": "up",
+      "title": {
+        "en": "Up"
+      }
+    },
+    {
+      "id": "down",
+      "title": {
+        "en": "Down"
+      }
+    },
+    {
+      "id": "stable",
+      "title": {
+        "en": "Stable"
+      }
+    }
+  ]
+} 

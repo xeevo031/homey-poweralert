@@ -1,0 +1,25 @@
+{
+  "id": "system_utilization",
+  "type": "number",
+  "title": {
+    "en": "System Utilization"
+  },
+  "desc": {
+    "en": "The percentage of available capacity being used"
+  },
+  "insights": true,
+  "insightsTitleTrue": {
+    "en": "System Utilization"
+  },
+  "units": {
+    "en": "%"
+  },
+  "decimals": 1,
+  "min": 0,
+  "max": 100,
+  "chartType": "line",
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/utilization.svg"
+} 

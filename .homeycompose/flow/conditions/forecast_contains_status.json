@@ -1,0 +1,62 @@
+{
+  "id": "forecast_contains_status",
+  "title": {
+    "en": "Forecast Contains Status"
+  },
+  "titleFormatted": {
+    "en": "Forecast !{{contains|does not contain}} [[status]] status in next [[hours]] hours"
+  },
+  "hint": {
+    "en": "Check if the forecast for the next X hours contains a specific status"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "status",
+      "type": "dropdown",
+      "title": {
+        "en": "Status Color"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    },
+    {
+      "name": "hours",
+      "type": "number",
+      "title": {
+        "en": "Hours to Check"
+      },
+      "min": 1,
+      "max": 24,
+      "step": 1
+    }
+  ]
+} 

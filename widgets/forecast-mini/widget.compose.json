@@ -1,23 +1,23 @@
 {
   "name": {
-    "en": "Probability Gauge"
+    "en": "Forecast Mini"
   },
-  "height": 300,
+  "height": 268,
   "transparent": false,
   "settings": [
     {
-      "id": "showLastUpdate",
+      "id": "showUpdated",
       "type": "checkbox",
       "title": {
-        "en": "Show Last Update Time"
+        "en": "Show Last Updated Time"
       },
       "value": true
     }
   ],
   "api": {
-    "getProbabilities": {
+    "getForecast": {
       "method": "GET",
-      "path": "/probabilities"
+      "path": "/forecast"
     }
   }
 }

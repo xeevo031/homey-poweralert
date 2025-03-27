@@ -1,0 +1,20 @@
+{
+  "id": "current_load_forecast",
+  "type": "number",
+  "title": {
+    "en": "Current Load Forecast"
+  },
+  "desc": {
+    "en": "Current power demand forecast in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 

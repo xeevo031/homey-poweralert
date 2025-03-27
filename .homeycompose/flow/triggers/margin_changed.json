@@ -1,0 +1,51 @@
+{
+  "id": "margin_changed",
+  "title": {
+    "en": "Power margin changed"
+  },
+  "titleFormatted": {
+    "en": "Power margin changed from [[previous_margin]] MW to [[current_margin]] MW"
+  },
+  "hint": {
+    "en": "Triggered when the power margin changes"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_margin",
+      "type": "number",
+      "title": {
+        "en": "Previous margin"
+      }
+    },
+    {
+      "name": "current_margin",
+      "type": "number",
+      "title": {
+        "en": "Current margin"
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "name": "previous_margin",
+      "type": "number",
+      "title": {
+        "en": "Previous margin"
+      }
+    },
+    {
+      "name": "current_margin",
+      "type": "number",
+      "title": {
+        "en": "Current margin"
+      }
+    }
+  ],
+  "icon": "gauge",
+  "category": "power_metrics"
+} 

@@ -1,36 +1,837 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "za.co.poweralert",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "compatibility": ">=12.1.2",
   "sdk": 3,
   "platforms": [
     "local"
   ],
   "name": {
-    "en": "Power Alert"
+    "en": "PowerAlert"
   },
   "description": {
-    "en": "Power Alert converts electricity demand data into status levels which are then communicated to the public. The Power Alert makes use of real-time data and takes into account historical loads, current real-time loads, weather conditions, supply and network conditions"
+    "en": "Monitor the South African power grid status in real-time"
   },
   "category": "energy",
   "permissions": [],
   "brandColor": "#114590",
   "images": {
-    "small": "assets/images/small.png",
-    "large": "assets/images/large.png",
-    "xlarge": "assets/images/xlarge.png"
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Neil Donnelly",
+    "email": "neil@xeevo.co.za"
   },
   "bugs": {
     "url": "https://github.com/xeevo031/homey-poweralert/issues"
   },
   "source": "https://github.com/xeevo031/homey-poweralert",
-  "author": {
-    "name": "Neil Donnelly",
-    "email": "neil@xeevo.co.za"
+  "settings": [
+    {
+      "type": "group",
+      "id": "general",
+      "title": {
+        "en": "General Settings"
+      },
+      "children": [
+        {
+          "id": "update_interval",
+          "type": "number",
+          "title": {
+            "en": "Update Interval"
+          },
+          "value": 5,
+          "min": 1,
+          "max": 60,
+          "units": "minutes",
+          "hint": {
+            "en": "How often to update data from PowerAlert (1-60 minutes)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "id": "thresholds",
+      "title": {
+        "en": "Threshold Settings"
+      },
+      "children": [
+        {
+          "id": "margin_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Margin Thresholds"
+          },
+          "value": "1000,2000,3000,4000,5000,10000,15000,20000",
+          "hint": {
+            "en": "Comma-separated list of margin thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "demand_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Demand Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of demand thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "capacity_thresholds",
+          "type": "text",
+          "title": {
+            "en": "Capacity Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of capacity thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "critical_margin",
+          "type": "number",
+          "title": {
+            "en": "Critical Margin"
+          },
+          "value": 500,
+          "min": 0,
+          "max": 5000,
+          "units": "MW",
+          "hint": {
+            "en": "Margin below which the system is considered critical"
+          }
+        },
+        {
+          "id": "high_utilization",
+          "type": "number",
+          "title": {
+            "en": "High Utilization Threshold"
+          },
+          "value": 90,
+          "min": 0,
+          "max": 100,
+          "units": "%",
+          "hint": {
+            "en": "Utilization percentage above which the system is considered at high risk"
+          }
+        },
+        {
+          "id": "stable_margin",
+          "type": "number",
+          "title": {
+            "en": "Stable Margin"
+          },
+          "value": 3000,
+          "min": 0,
+          "max": 10000,
+          "units": "MW",
+          "hint": {
+            "en": "Margin above which the system is considered stable"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": {
+    "forecast-mini": {
+      "name": {
+        "en": "Forecast Mini"
+      },
+      "height": 268,
+      "transparent": false,
+      "settings": [
+        {
+          "id": "showUpdated",
+          "type": "checkbox",
+          "title": {
+            "en": "Show Last Updated Time"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getForecast": {
+          "method": "GET",
+          "path": "/forecast"
+        }
+      },
+      "id": "forecast-mini"
+    },
+    "probability-gauge": {
+      "name": {
+        "en": "Probability Gauge"
+      },
+      "height": 300,
+      "transparent": false,
+      "settings": [
+        {
+          "id": "showLastUpdate",
+          "type": "checkbox",
+          "title": {
+            "en": "Show Last Update Time"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getProbabilities": {
+          "method": "GET",
+          "path": "/probabilities"
+        }
+      },
+      "id": "probability-gauge"
+    }
   },
   "flow": {
     "triggers": [
+      {
+        "id": "capacity_threshold_reached",
+        "title": {
+          "en": "Capacity Threshold Reached"
+        },
+        "titleFormatted": {
+          "en": "Power capacity [[direction]] threshold of [[threshold]] MW (current: [[current_capacity]] MW)"
+        },
+        "hint": {
+          "en": "Triggered when the power capacity crosses a configured threshold"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "threshold",
+            "type": "number",
+            "title": {
+              "en": "Threshold Value (MW)"
+            },
+            "example": 45000
+          },
+          {
+            "name": "current_capacity",
+            "type": "number",
+            "title": {
+              "en": "Current Capacity (MW)"
+            },
+            "example": 42000
+          },
+          {
+            "name": "previous_capacity",
+            "type": "number",
+            "title": {
+              "en": "Previous Capacity (MW)"
+            },
+            "example": 48000
+          },
+          {
+            "name": "direction",
+            "type": "string",
+            "title": {
+              "en": "Direction"
+            },
+            "example": "below"
+          },
+          {
+            "name": "time_until_recovery",
+            "type": "number",
+            "title": {
+              "en": "Expected Time Until Recovery (minutes)"
+            },
+            "example": 240
+          },
+          {
+            "name": "rate_of_change",
+            "type": "number",
+            "title": {
+              "en": "Rate of Change (MW/hour)"
+            },
+            "example": -600
+          },
+          {
+            "name": "historical_comparison",
+            "type": "string",
+            "title": {
+              "en": "Historical Comparison"
+            },
+            "example": "15% lower than typical Tuesday"
+          },
+          {
+            "name": "trend_direction",
+            "type": "string",
+            "title": {
+              "en": "Trend Direction"
+            },
+            "example": "decreasing"
+          },
+          {
+            "name": "confidence_level",
+            "type": "number",
+            "title": {
+              "en": "Forecast Confidence Level (%)"
+            },
+            "example": 85
+          },
+          {
+            "name": "max_available_capacity",
+            "type": "number",
+            "title": {
+              "en": "Maximum Available Capacity (MW)"
+            },
+            "example": 50000
+          },
+          {
+            "name": "reserve_margin",
+            "type": "number",
+            "title": {
+              "en": "Reserve Margin (MW)"
+            },
+            "example": 8000
+          },
+          {
+            "name": "reserve_percentage",
+            "type": "number",
+            "title": {
+              "en": "Reserve Percentage (%)"
+            },
+            "example": 19
+          }
+        ],
+        "icon": "gauge",
+        "category": "power_metrics"
+      },
+      {
+        "id": "demand_changed",
+        "title": {
+          "en": "Power demand changed"
+        },
+        "titleFormatted": {
+          "en": "Power demand changed from [[previous_demand]] MW to [[current_demand]] MW"
+        },
+        "hint": {
+          "en": "Triggered when the power demand changes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_demand",
+            "type": "number",
+            "title": {
+              "en": "Previous demand"
+            }
+          },
+          {
+            "name": "current_demand",
+            "type": "number",
+            "title": {
+              "en": "Current demand"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_demand",
+            "type": "number",
+            "title": {
+              "en": "Previous demand"
+            }
+          },
+          {
+            "name": "current_demand",
+            "type": "number",
+            "title": {
+              "en": "Current demand"
+            }
+          }
+        ],
+        "icon": "gauge",
+        "category": "power_metrics"
+      },
+      {
+        "id": "demand_threshold_reached",
+        "title": {
+          "en": "Demand Threshold Reached"
+        },
+        "titleFormatted": {
+          "en": "Power demand [[direction]] threshold of [[threshold]] MW (current: [[current_demand]] MW)"
+        },
+        "hint": {
+          "en": "Triggered when the power demand crosses a configured threshold"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "threshold",
+            "type": "number",
+            "title": {
+              "en": "Threshold Value (MW)"
+            },
+            "example": 40000
+          },
+          {
+            "name": "current_demand",
+            "type": "number",
+            "title": {
+              "en": "Current Demand (MW)"
+            },
+            "example": 42000
+          },
+          {
+            "name": "previous_demand",
+            "type": "number",
+            "title": {
+              "en": "Previous Demand (MW)"
+            },
+            "example": 38000
+          },
+          {
+            "name": "direction",
+            "type": "string",
+            "title": {
+              "en": "Direction"
+            },
+            "example": "above"
+          },
+          {
+            "name": "time_until_recovery",
+            "type": "number",
+            "title": {
+              "en": "Expected Time Until Recovery (minutes)"
+            },
+            "example": 180
+          },
+          {
+            "name": "rate_of_change",
+            "type": "number",
+            "title": {
+              "en": "Rate of Change (MW/hour)"
+            },
+            "example": 400
+          },
+          {
+            "name": "historical_comparison",
+            "type": "string",
+            "title": {
+              "en": "Historical Comparison"
+            },
+            "example": "10% higher than typical Tuesday"
+          },
+          {
+            "name": "trend_direction",
+            "type": "string",
+            "title": {
+              "en": "Trend Direction"
+            },
+            "example": "increasing"
+          },
+          {
+            "name": "confidence_level",
+            "type": "number",
+            "title": {
+              "en": "Forecast Confidence Level (%)"
+            },
+            "example": 85
+          },
+          {
+            "name": "peak_demand",
+            "type": "number",
+            "title": {
+              "en": "Peak Demand (MW)"
+            },
+            "example": 45000
+          },
+          {
+            "name": "utilization_percentage",
+            "type": "number",
+            "title": {
+              "en": "Current Utilization (%)"
+            },
+            "example": 95
+          }
+        ],
+        "icon": "gauge",
+        "category": "power_metrics"
+      },
+      {
+        "id": "direction_changed",
+        "title": {
+          "en": "System direction changed"
+        },
+        "titleFormatted": {
+          "en": "System direction changed from [[previous_direction]] to [[current_direction]]"
+        },
+        "hint": {
+          "en": "Triggered when the system direction changes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Previous direction"
+            },
+            "values": [
+              {
+                "id": "up",
+                "title": {
+                  "en": "Up"
+                }
+              },
+              {
+                "id": "down",
+                "title": {
+                  "en": "Down"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Current direction"
+            },
+            "values": [
+              {
+                "id": "up",
+                "title": {
+                  "en": "Up"
+                }
+              },
+              {
+                "id": "down",
+                "title": {
+                  "en": "Down"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_direction",
+            "type": "string",
+            "title": {
+              "en": "Previous direction"
+            }
+          },
+          {
+            "name": "current_direction",
+            "type": "string",
+            "title": {
+              "en": "Current direction"
+            }
+          }
+        ],
+        "icon": "arrow",
+        "category": "system_status"
+      },
+      {
+        "id": "forecast_time_period_status",
+        "title": {
+          "en": "Forecast Time Period Status"
+        },
+        "titleFormatted": {
+          "en": "[[time_period]] forecast becomes [[status]]"
+        },
+        "hint": {
+          "en": "Triggers when a specific time period in the forecast matches a status"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "time_period",
+            "type": "dropdown",
+            "title": {
+              "en": "Time Period"
+            },
+            "values": [
+              {
+                "id": "morning",
+                "title": {
+                  "en": "Morning (06:00-09:00)"
+                }
+              },
+              {
+                "id": "midday",
+                "title": {
+                  "en": "Midday (11:00-14:00)"
+                }
+              },
+              {
+                "id": "evening",
+                "title": {
+                  "en": "Evening (18:00-21:00)"
+                }
+              }
+            ]
+          },
+          {
+            "name": "status",
+            "type": "dropdown",
+            "title": {
+              "en": "Status Color"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "margin_changed",
+        "title": {
+          "en": "Power margin changed"
+        },
+        "titleFormatted": {
+          "en": "Power margin changed from [[previous_margin]] MW to [[current_margin]] MW"
+        },
+        "hint": {
+          "en": "Triggered when the power margin changes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_margin",
+            "type": "number",
+            "title": {
+              "en": "Previous margin"
+            }
+          },
+          {
+            "name": "current_margin",
+            "type": "number",
+            "title": {
+              "en": "Current margin"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_margin",
+            "type": "number",
+            "title": {
+              "en": "Previous margin"
+            }
+          },
+          {
+            "name": "current_margin",
+            "type": "number",
+            "title": {
+              "en": "Current margin"
+            }
+          }
+        ],
+        "icon": "gauge",
+        "category": "power_metrics"
+      },
+      {
+        "id": "margin_threshold_reached",
+        "title": {
+          "en": "Margin Threshold Reached"
+        },
+        "titleFormatted": {
+          "en": "Power margin [[direction]] threshold of [[threshold]] MW (current: [[current_margin]] MW)"
+        },
+        "hint": {
+          "en": "Triggered when the power margin crosses a configured threshold"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "threshold",
+            "type": "number",
+            "title": {
+              "en": "Threshold Value (MW)"
+            },
+            "example": 5000
+          },
+          {
+            "name": "current_margin",
+            "type": "number",
+            "title": {
+              "en": "Current Margin (MW)"
+            },
+            "example": 4800
+          },
+          {
+            "name": "previous_margin",
+            "type": "number",
+            "title": {
+              "en": "Previous Margin (MW)"
+            },
+            "example": 5200
+          },
+          {
+            "name": "direction",
+            "type": "string",
+            "title": {
+              "en": "Direction"
+            },
+            "example": "below"
+          },
+          {
+            "name": "time_until_recovery",
+            "type": "number",
+            "title": {
+              "en": "Expected Time Until Recovery (minutes)"
+            },
+            "example": 120
+          },
+          {
+            "name": "rate_of_change",
+            "type": "number",
+            "title": {
+              "en": "Rate of Change (MW/hour)"
+            },
+            "example": -200
+          },
+          {
+            "name": "historical_comparison",
+            "type": "string",
+            "title": {
+              "en": "Historical Comparison"
+            },
+            "example": "15% worse than typical Tuesday"
+          },
+          {
+            "name": "trend_direction",
+            "type": "string",
+            "title": {
+              "en": "Trend Direction"
+            },
+            "example": "deteriorating"
+          },
+          {
+            "name": "confidence_level",
+            "type": "number",
+            "title": {
+              "en": "Forecast Confidence Level (%)"
+            },
+            "example": 85
+          }
+        ],
+        "icon": "gauge",
+        "category": "power_metrics"
+      },
+      {
+        "id": "peak_demand_time",
+        "title": {
+          "en": "Peak Demand Time"
+        },
+        "titleFormatted": {
+          "en": "Peak demand time identified"
+        },
+        "hint": {
+          "en": "Triggers when the forecasted peak demand time is identified"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "peak_time",
+            "type": "string",
+            "title": {
+              "en": "Peak Time"
+            },
+            "example": "18:00"
+          },
+          {
+            "name": "peak_demand",
+            "type": "number",
+            "title": {
+              "en": "Peak Demand"
+            },
+            "example": 35000
+          },
+          {
+            "name": "system_color",
+            "type": "string",
+            "title": {
+              "en": "System Color"
+            },
+            "example": "Red"
+          }
+        ]
+      },
       {
         "id": "probability_changed",
         "title": {
@@ -65,15 +866,100 @@
         ]
       },
       {
-        "id": "stage_changed",
+        "id": "rapid_status_change",
         "title": {
-          "en": "Loadshedding stage has changed"
+          "en": "Rapid Status Change"
         },
         "titleFormatted": {
-          "en": "Loadshedding stage has changed from [[previous_stage]] to [[current_stage]]"
+          "en": "System status changed from [[from_status]] to [[to_status]]"
         },
         "hint": {
-          "en": "Triggers when the loadshedding stage changes."
+          "en": "Triggers when the system status changes rapidly indicating potential grid instability"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "from_status",
+            "type": "dropdown",
+            "title": {
+              "en": "From Status"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          },
+          {
+            "name": "to_status",
+            "type": "dropdown",
+            "title": {
+              "en": "To Status"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "status_changed",
+        "title": {
+          "en": "System Status Changed"
+        },
+        "titleFormatted": {
+          "en": "System status changed: Color [[previous_color]] → [[current_color]], Direction [[previous_direction]] → [[current_direction]], Trend [[previous_trend]] → [[current_trend]]"
+        },
+        "hint": {
+          "en": "When any system status changes (color, direction, trend)"
         },
         "args": [
           {
@@ -82,23 +968,693 @@
             "filter": "driver_id=powerstatus"
           },
           {
-            "name": "previous_stage",
-            "type": "number",
+            "name": "previous_color",
+            "type": "dropdown",
             "title": {
-              "en": "Previous Stage"
+              "en": "Previous Color"
+            },
+            "values": [
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_color",
+            "type": "dropdown",
+            "title": {
+              "en": "Current Color"
+            },
+            "values": [
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              }
+            ]
+          },
+          {
+            "name": "previous_direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Previous Direction"
+            },
+            "values": [
+              {
+                "id": "up",
+                "title": {
+                  "en": "Up"
+                }
+              },
+              {
+                "id": "down",
+                "title": {
+                  "en": "Down"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Current Direction"
+            },
+            "values": [
+              {
+                "id": "up",
+                "title": {
+                  "en": "Up"
+                }
+              },
+              {
+                "id": "down",
+                "title": {
+                  "en": "Down"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          },
+          {
+            "name": "previous_trend",
+            "type": "dropdown",
+            "title": {
+              "en": "Previous Trend"
+            },
+            "values": [
+              {
+                "id": "increasing",
+                "title": {
+                  "en": "Increasing"
+                }
+              },
+              {
+                "id": "decreasing",
+                "title": {
+                  "en": "Decreasing"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_trend",
+            "type": "dropdown",
+            "title": {
+              "en": "Current Trend"
+            },
+            "values": [
+              {
+                "id": "increasing",
+                "title": {
+                  "en": "Increasing"
+                }
+              },
+              {
+                "id": "decreasing",
+                "title": {
+                  "en": "Decreasing"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_color",
+            "type": "string",
+            "title": {
+              "en": "Previous color"
             }
           },
           {
-            "name": "current_stage",
-            "type": "number",
+            "name": "current_color",
+            "type": "string",
             "title": {
-              "en": "Current Stage"
+              "en": "Current color"
+            }
+          },
+          {
+            "name": "previous_direction",
+            "type": "string",
+            "title": {
+              "en": "Previous direction"
+            }
+          },
+          {
+            "name": "current_direction",
+            "type": "string",
+            "title": {
+              "en": "Current direction"
+            }
+          },
+          {
+            "name": "previous_trend",
+            "type": "string",
+            "title": {
+              "en": "Previous trend"
+            }
+          },
+          {
+            "name": "current_trend",
+            "type": "string",
+            "title": {
+              "en": "Current trend"
             }
           }
+        ],
+        "icon": "info",
+        "category": "system_status"
+      },
+      {
+        "id": "status_duration_exceeded",
+        "title": {
+          "en": "Status Duration Exceeded"
+        },
+        "titleFormatted": {
+          "en": "System has been [[status]] for [[duration]] minutes"
+        },
+        "hint": {
+          "en": "Triggers when the system has been in a specific status for a set duration"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "status",
+            "type": "dropdown",
+            "title": {
+              "en": "Status Color"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          },
+          {
+            "name": "duration",
+            "type": "number",
+            "title": {
+              "en": "Duration (minutes)"
+            },
+            "min": 5,
+            "max": 1440,
+            "step": 5
+          }
         ]
+      },
+      {
+        "id": "system_color_changed",
+        "title": {
+          "en": "System Color Changed"
+        },
+        "titleFormatted": {
+          "en": "System color changed from [[previous_color]] to [[current_color]]"
+        },
+        "hint": {
+          "en": "Triggered when the system color changes"
+        },
+        "platforms": [
+          "local"
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_color",
+            "type": "dropdown",
+            "title": {
+              "en": "Previous Color"
+            },
+            "values": [
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_color",
+            "type": "dropdown",
+            "title": {
+              "en": "Current Color"
+            },
+            "values": [
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_duration",
+            "type": "string",
+            "title": {
+              "en": "Previous Duration"
+            },
+            "example": "2 hours"
+          },
+          {
+            "name": "change_type",
+            "type": "string",
+            "title": {
+              "en": "Change Type"
+            },
+            "example": "Improvement"
+          },
+          {
+            "name": "forecast_stability",
+            "type": "string",
+            "title": {
+              "en": "Forecast Stability"
+            },
+            "example": "Stable for next 4 hours"
+          },
+          {
+            "name": "next_change_forecast",
+            "type": "string",
+            "title": {
+              "en": "Next Change Forecast"
+            },
+            "example": "Expected to change in 3 hours"
+          },
+          {
+            "name": "margin_change",
+            "type": "string",
+            "title": {
+              "en": "Margin Change"
+            },
+            "example": "Increased by 500 MW"
+          },
+          {
+            "name": "utilization_change",
+            "type": "string",
+            "title": {
+              "en": "Utilization Change"
+            },
+            "example": "Decreased by 5%"
+          },
+          {
+            "name": "color_frequency_today",
+            "type": "string",
+            "title": {
+              "en": "Color Frequency Today"
+            },
+            "example": "3rd time today (25% of the day)"
+          },
+          {
+            "name": "typical_duration",
+            "type": "string",
+            "title": {
+              "en": "Typical Duration"
+            },
+            "example": "Usually lasts 4 hours"
+          },
+          {
+            "name": "time_pattern",
+            "type": "string",
+            "title": {
+              "en": "Time Pattern"
+            },
+            "example": "Common for this time (occurs 75% of days at this hour)"
+          },
+          {
+            "name": "recent_instability",
+            "type": "string",
+            "title": {
+              "en": "Recent Instability"
+            },
+            "example": "5 changes in last 24h (above average)"
+          },
+          {
+            "name": "historical_context",
+            "type": "string",
+            "title": {
+              "en": "Historical Context"
+            },
+            "example": "Margin 20% above typical for this time"
+          },
+          {
+            "name": "recovery_forecast",
+            "type": "string",
+            "title": {
+              "en": "Recovery Forecast"
+            },
+            "example": "Typically recovers to green within 2-4 hours"
+          }
+        ]
+      },
+      {
+        "id": "trend_changed",
+        "title": {
+          "en": "System trend changed"
+        },
+        "titleFormatted": {
+          "en": "System trend changed from [[previous_trend]] to [[current_trend]]"
+        },
+        "hint": {
+          "en": "Triggered when the system trend changes"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "previous_trend",
+            "type": "dropdown",
+            "title": {
+              "en": "Previous trend"
+            },
+            "values": [
+              {
+                "id": "increasing",
+                "title": {
+                  "en": "Increasing"
+                }
+              },
+              {
+                "id": "decreasing",
+                "title": {
+                  "en": "Decreasing"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          },
+          {
+            "name": "current_trend",
+            "type": "dropdown",
+            "title": {
+              "en": "Current trend"
+            },
+            "values": [
+              {
+                "id": "increasing",
+                "title": {
+                  "en": "Increasing"
+                }
+              },
+              {
+                "id": "decreasing",
+                "title": {
+                  "en": "Decreasing"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "previous_trend",
+            "type": "string",
+            "title": {
+              "en": "Previous trend"
+            }
+          },
+          {
+            "name": "current_trend",
+            "type": "string",
+            "title": {
+              "en": "Current trend"
+            }
+          }
+        ],
+        "icon": "arrow-trend",
+        "category": "system_status"
       }
     ],
     "conditions": [
+      {
+        "id": "capacity_usage_above",
+        "title": {
+          "en": "Capacity usage !{{is|is not}} above"
+        },
+        "titleFormatted": {
+          "en": "Capacity usage !{{is|is not}} above [[percentage]]%"
+        },
+        "hint": {
+          "en": "Check if the current capacity usage is above the specified percentage."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "percentage",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "title": {
+              "en": "Percentage"
+            }
+          }
+        ]
+      },
+      {
+        "id": "forecast_contains_status",
+        "title": {
+          "en": "Forecast Contains Status"
+        },
+        "titleFormatted": {
+          "en": "Forecast !{{contains|does not contain}} [[status]] status in next [[hours]] hours"
+        },
+        "hint": {
+          "en": "Check if the forecast for the next X hours contains a specific status"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "status",
+            "type": "dropdown",
+            "title": {
+              "en": "Status Color"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          },
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours to Check"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "id": "margin_above",
+        "title": {
+          "en": "Power margin !{{is|is not}} above"
+        },
+        "titleFormatted": {
+          "en": "Power margin !{{is|is not}} above [[threshold]] MW"
+        },
+        "hint": {
+          "en": "Check if the current power margin is above the specified threshold."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "threshold",
+            "type": "number",
+            "min": 0,
+            "max": 50000,
+            "step": 100,
+            "title": {
+              "en": "Threshold (MW)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "margin_below",
+        "title": {
+          "en": "Power margin !{{is|is not}} below"
+        },
+        "titleFormatted": {
+          "en": "Power margin !{{is|is not}} below [[threshold]] MW"
+        },
+        "hint": {
+          "en": "Check if the current power margin is below the specified threshold."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "threshold",
+            "type": "number",
+            "min": 0,
+            "max": 50000,
+            "step": 100,
+            "title": {
+              "en": "Threshold (MW)"
+            }
+          }
+        ]
+      },
       {
         "id": "probability_below",
         "title": {
@@ -129,15 +1685,61 @@
         ]
       },
       {
-        "id": "stage_is",
+        "id": "status_trending_direction",
         "title": {
-          "en": "Loadshedding stage !{{is|is not}}"
+          "en": "Status Trending Direction"
         },
         "titleFormatted": {
-          "en": "Loadshedding stage !{{is|is not}} [[stage]]"
+          "en": "Status is !{{trending|not trending}} [[direction]]"
         },
         "hint": {
-          "en": "Check if the current loadshedding stage matches the specified value."
+          "en": "Check if the overall system status is trending in a specific direction"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Trend Direction"
+            },
+            "values": [
+              {
+                "id": "improving",
+                "title": {
+                  "en": "Improving"
+                }
+              },
+              {
+                "id": "worsening",
+                "title": {
+                  "en": "Worsening"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "system_color_is",
+        "title": {
+          "en": "System color !{{is|is not}}"
+        },
+        "titleFormatted": {
+          "en": "System color !{{is|is not}} [[color]]"
+        },
+        "hint": {
+          "en": "Check if the current system color matches the specified value."
         },
         "args": [
           {
@@ -146,76 +1748,789 @@
             "filter": "driver_id=powerstatus"
           },
           {
-            "name": "stage",
+            "name": "color",
             "type": "dropdown",
             "values": [
               {
-                "id": "0",
+                "id": "red",
                 "title": {
-                  "en": "0 (No Loadshedding)"
+                  "en": "Red"
                 }
               },
               {
-                "id": "1",
+                "id": "orange",
                 "title": {
-                  "en": "1"
+                  "en": "Orange"
                 }
               },
               {
-                "id": "2",
+                "id": "green",
                 "title": {
-                  "en": "2"
-                }
-              },
-              {
-                "id": "3",
-                "title": {
-                  "en": "3"
-                }
-              },
-              {
-                "id": "4",
-                "title": {
-                  "en": "4"
-                }
-              },
-              {
-                "id": "5",
-                "title": {
-                  "en": "5"
-                }
-              },
-              {
-                "id": "6",
-                "title": {
-                  "en": "6"
-                }
-              },
-              {
-                "id": "7",
-                "title": {
-                  "en": "7"
-                }
-              },
-              {
-                "id": "8",
-                "title": {
-                  "en": "8"
+                  "en": "Green"
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "system_critical",
+        "title": {
+          "en": "System !{{is|is not}} critical"
+        },
+        "hint": {
+          "en": "When the power margin is below 500MW"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ]
+      },
+      {
+        "id": "system_direction_is",
+        "title": {
+          "en": "System direction !{{is|is not}}"
+        },
+        "titleFormatted": {
+          "en": "System direction !{{is|is not}} [[direction]]"
+        },
+        "hint": {
+          "en": "Check if the current system direction matches the specified value."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "direction",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "up",
+                "title": {
+                  "en": "Up"
+                }
+              },
+              {
+                "id": "down",
+                "title": {
+                  "en": "Down"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "system_improving",
+        "title": {
+          "en": "System !{{is|is not}} improving"
+        },
+        "hint": {
+          "en": "When the system margin is increasing and demand is decreasing"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ]
+      },
+      {
+        "id": "system_stable",
+        "title": {
+          "en": "System !{{is|is not}} stable"
+        },
+        "hint": {
+          "en": "When the system has a comfortable margin (>3000MW) and stable demand"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ]
+      },
+      {
+        "id": "time_until_status_change",
+        "title": {
+          "en": "Time Until Status Change"
+        },
+        "titleFormatted": {
+          "en": "System !{{will|will not}} change from [[from_status]] to [[to_status]] within [[hours]] hours"
+        },
+        "hint": {
+          "en": "Check if a status change is expected within a specific time period"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "from_status",
+            "type": "dropdown",
+            "title": {
+              "en": "From Status"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          },
+          {
+            "name": "to_status",
+            "type": "dropdown",
+            "title": {
+              "en": "To Status"
+            },
+            "values": [
+              {
+                "id": "green",
+                "title": {
+                  "en": "Green"
+                }
+              },
+              {
+                "id": "yellow",
+                "title": {
+                  "en": "Yellow"
+                }
+              },
+              {
+                "id": "orange",
+                "title": {
+                  "en": "Orange"
+                }
+              },
+              {
+                "id": "red",
+                "title": {
+                  "en": "Red"
+                }
+              }
+            ]
+          },
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "id": "utilization_rate_of_change",
+        "title": {
+          "en": "Utilization Rate of Change"
+        },
+        "titleFormatted": {
+          "en": "Utilization !{{is|is not}} [[direction]] at rate of [[rate]]% per hour"
+        },
+        "hint": {
+          "en": "Check if the system utilization is changing at a specific rate"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "direction",
+            "type": "dropdown",
+            "title": {
+              "en": "Direction"
+            },
+            "values": [
+              {
+                "id": "increasing",
+                "title": {
+                  "en": "Increasing"
+                }
+              },
+              {
+                "id": "decreasing",
+                "title": {
+                  "en": "Decreasing"
+                }
+              }
+            ]
+          },
+          {
+            "name": "rate",
+            "type": "number",
+            "title": {
+              "en": "Rate (%/hour)"
+            },
+            "min": 0.1,
+            "max": 20,
+            "step": 0.1
           }
         ]
       }
     ],
     "actions": [
       {
-        "id": "update_data",
+        "id": "calculate_energy_risk_score",
         "title": {
-          "en": "Update PowerAlert data"
+          "en": "Calculate Energy Risk Score"
+        },
+        "titleFormatted": {
+          "en": "Calculate energy risk score with [[sensitivity]] sensitivity"
         },
         "hint": {
-          "en": "Force the PowerAlert device to update its data immediately."
+          "en": "Computes a risk score based on current status and forecast"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "sensitivity",
+            "type": "dropdown",
+            "title": {
+              "en": "Risk Sensitivity"
+            },
+            "values": [
+              {
+                "id": "low",
+                "title": {
+                  "en": "Low"
+                }
+              },
+              {
+                "id": "medium",
+                "title": {
+                  "en": "Medium"
+                }
+              },
+              {
+                "id": "high",
+                "title": {
+                  "en": "High"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "risk_score",
+            "type": "number",
+            "title": {
+              "en": "Risk Score"
+            },
+            "example": 75
+          },
+          {
+            "name": "risk_level",
+            "type": "string",
+            "title": {
+              "en": "Risk Level"
+            },
+            "example": "High"
+          },
+          {
+            "name": "recommendation",
+            "type": "string",
+            "title": {
+              "en": "Recommendation"
+            },
+            "example": "Reduce non-essential power usage for next 3 hours"
+          }
+        ]
+      },
+      {
+        "id": "check_system_state",
+        "title": {
+          "en": "Check System State"
+        },
+        "titleFormatted": {
+          "en": "Check if system is in [[state]] state"
+        },
+        "hint": {
+          "en": "Check if the system is in a specific state"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "state",
+            "type": "dropdown",
+            "title": {
+              "en": "State"
+            },
+            "values": [
+              {
+                "id": "critical",
+                "title": {
+                  "en": "Critical"
+                }
+              },
+              {
+                "id": "stable",
+                "title": {
+                  "en": "Stable"
+                }
+              },
+              {
+                "id": "improving",
+                "title": {
+                  "en": "Improving"
+                }
+              },
+              {
+                "id": "high_utilization",
+                "title": {
+                  "en": "High Utilization"
+                }
+              }
+            ]
+          }
+        ],
+        "returns": {
+          "type": "boolean",
+          "title": {
+            "en": "Is in State"
+          }
+        }
+      },
+      {
+        "id": "export_historical_data",
+        "title": {
+          "en": "Export Historical Data"
+        },
+        "titleFormatted": {
+          "en": "Export last [[hours]] hours of power data as [[format]]"
+        },
+        "hint": {
+          "en": "Exports historical power data for analysis or reporting. Use with email or other actions to send the data."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours of History"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          },
+          {
+            "name": "format",
+            "type": "dropdown",
+            "title": {
+              "en": "Export Format"
+            },
+            "values": [
+              {
+                "id": "csv",
+                "title": {
+                  "en": "CSV"
+                }
+              },
+              {
+                "id": "json",
+                "title": {
+                  "en": "JSON"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "name": "content",
+            "type": "string",
+            "title": {
+              "en": "Export Content"
+            },
+            "example": "Timestamp,Color,Direction,Demand,Capacity,MaxAvailability,Margin\n2024-03-26 14:00:00,green,stable,35000,45000,50000,10000"
+          },
+          {
+            "name": "mime_type",
+            "type": "string",
+            "title": {
+              "en": "MIME Type"
+            },
+            "example": "text/csv"
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "title": {
+              "en": "Filename"
+            },
+            "example": "power-alert-export-2024-03-26-14-00-00.csv"
+          },
+          {
+            "name": "record_count",
+            "type": "number",
+            "title": {
+              "en": "Record Count"
+            },
+            "example": 24
+          },
+          {
+            "name": "export_time",
+            "type": "string",
+            "title": {
+              "en": "Export Time"
+            },
+            "example": "2024-03-26 14:00:00"
+          },
+          {
+            "name": "start_time",
+            "type": "string",
+            "title": {
+              "en": "Data Start Time"
+            },
+            "example": "2024-03-26 00:00:00"
+          },
+          {
+            "name": "end_time",
+            "type": "string",
+            "title": {
+              "en": "Data End Time"
+            },
+            "example": "2024-03-26 23:00:00"
+          },
+          {
+            "name": "color_changes",
+            "type": "number",
+            "title": {
+              "en": "Number of Color Changes"
+            },
+            "example": 3
+          },
+          {
+            "name": "average_demand",
+            "type": "number",
+            "title": {
+              "en": "Average Demand"
+            },
+            "example": 35000
+          },
+          {
+            "name": "average_margin",
+            "type": "number",
+            "title": {
+              "en": "Average Margin"
+            },
+            "example": 10000
+          }
+        ]
+      },
+      {
+        "id": "get_metrics",
+        "title": {
+          "en": "Get Power Metrics"
+        },
+        "titleFormatted": {
+          "en": "Get [[metric]] value"
+        },
+        "hint": {
+          "en": "Get specific power system metrics"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "metric",
+            "type": "dropdown",
+            "title": {
+              "en": "Metric"
+            },
+            "values": [
+              {
+                "id": "margin",
+                "title": {
+                  "en": "Power Margin"
+                }
+              },
+              {
+                "id": "demand",
+                "title": {
+                  "en": "Power Demand"
+                }
+              },
+              {
+                "id": "capacity",
+                "title": {
+                  "en": "Available Capacity"
+                }
+              },
+              {
+                "id": "utilization",
+                "title": {
+                  "en": "System Utilization"
+                }
+              },
+              {
+                "id": "reserve_margin",
+                "title": {
+                  "en": "Reserve Margin"
+                }
+              }
+            ]
+          }
+        ],
+        "returns": {
+          "type": "number",
+          "title": {
+            "en": "Value"
+          },
+          "units": {
+            "margin": "MW",
+            "demand": "MW",
+            "capacity": "MW",
+            "utilization": "%",
+            "reserve_margin": "%"
+          }
+        }
+      },
+      {
+        "id": "get_optimal_energy_period",
+        "title": {
+          "en": "Get Optimal Energy Period"
+        },
+        "titleFormatted": {
+          "en": "Find optimal [[duration]] minute period between [[start_time]] and [[end_time]]"
+        },
+        "hint": {
+          "en": "Returns the best time period for energy-intensive activities based on forecast demand"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "duration",
+            "type": "number",
+            "title": {
+              "en": "Duration (minutes)"
+            },
+            "min": 30,
+            "max": 360,
+            "step": 30
+          },
+          {
+            "name": "start_time",
+            "type": "text",
+            "title": {
+              "en": "Start Time (HH:MM)"
+            },
+            "placeholder": {
+              "en": "06:00"
+            }
+          },
+          {
+            "name": "end_time",
+            "type": "text",
+            "title": {
+              "en": "End Time (HH:MM)"
+            },
+            "placeholder": {
+              "en": "22:00"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "optimal_start",
+            "type": "string",
+            "title": {
+              "en": "Optimal Start Time"
+            },
+            "example": "14:30"
+          },
+          {
+            "name": "average_demand",
+            "type": "number",
+            "title": {
+              "en": "Average Demand"
+            },
+            "example": 25000
+          },
+          {
+            "name": "system_color",
+            "type": "string",
+            "title": {
+              "en": "System Color"
+            },
+            "example": "Green"
+          }
+        ]
+      },
+      {
+        "id": "get_status_forecast_timeline",
+        "title": {
+          "en": "Get Status Forecast Timeline"
+        },
+        "titleFormatted": {
+          "en": "Get status forecast timeline for next [[hours]] hours"
+        },
+        "hint": {
+          "en": "Returns a formatted timeline of forecasted status changes"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=powerstatus"
+          },
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours to Forecast"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1
+          }
+        ],
+        "tokens": [
+          {
+            "name": "timeline",
+            "type": "string",
+            "title": {
+              "en": "Timeline"
+            },
+            "example": "06:00-09:00: Green (Stable)\n09:00-12:00: Yellow (Increasing)"
+          },
+          {
+            "name": "status_changes",
+            "type": "number",
+            "title": {
+              "en": "Status Changes"
+            },
+            "example": 3
+          },
+          {
+            "name": "worst_period",
+            "type": "string",
+            "title": {
+              "en": "Worst Period"
+            },
+            "example": "18:00-21:00 (Red)"
+          }
+        ]
+      },
+      {
+        "id": "get_status_message",
+        "title": {
+          "en": "Get Status Message"
+        },
+        "hint": {
+          "en": "Get the current detailed status message"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "returns": {
+          "type": "string",
+          "title": {
+            "en": "Status Message"
+          }
+        }
+      },
+      {
+        "id": "send_status_notification",
+        "title": {
+          "en": "Send Status Notification"
+        },
+        "titleFormatted": {
+          "en": "Send current status as notification"
+        },
+        "hint": {
+          "en": "Sends the current power status as a mobile notification"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=powerstatus"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "status_message",
+            "type": "string",
+            "title": {
+              "en": "Status Message"
+            }
+          }
+        ]
+      },
+      {
+        "id": "update_data",
+        "title": {
+          "en": "Update Power Status Data"
+        },
+        "hint": {
+          "en": "Manually trigger an update of the power status data"
         },
         "args": [
           {
@@ -235,14 +2550,29 @@
       },
       "class": "sensor",
       "capabilities": [
-        "loadshedding_stage",
         "power_probability",
-        "status_message",
         "peak_demand",
         "available_capacity",
         "lowest_margin",
-        "forecast_highest_stage",
-        "last_updated"
+        "last_updated",
+        "average_capacity",
+        "current_load_forecast",
+        "current_declared_availability",
+        "trend_status",
+        "system_direction",
+        "current_max_availability",
+        "average_max_availability",
+        "max_max_availability",
+        "min_max_availability",
+        "max_load_forecast",
+        "min_load_forecast",
+        "max_declared_availability",
+        "min_declared_availability",
+        "average_margin",
+        "average_demand",
+        "system_color",
+        "status_message",
+        "color_changes"
       ],
       "platforms": [
         "local"
@@ -269,75 +2599,108 @@
           "id": "add_devices",
           "template": "add_devices"
         }
+      ],
+      "settings": [
+        {
+          "id": "update_interval",
+          "type": "number",
+          "label": {
+            "en": "Update Interval"
+          },
+          "value": 5,
+          "min": 1,
+          "max": 60,
+          "units": {
+            "en": "minutes"
+          },
+          "hint": {
+            "en": "How often to update data from PowerAlert (1-60 minutes)"
+          }
+        },
+        {
+          "id": "margin_thresholds",
+          "type": "text",
+          "label": {
+            "en": "Margin Thresholds"
+          },
+          "value": "1000,2000,3000,4000,5000,10000,15000,20000",
+          "hint": {
+            "en": "Comma-separated list of margin thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "demand_thresholds",
+          "type": "text",
+          "label": {
+            "en": "Demand Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of demand thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "capacity_thresholds",
+          "type": "text",
+          "label": {
+            "en": "Capacity Thresholds"
+          },
+          "value": "10000,20000,30000,40000,45000",
+          "hint": {
+            "en": "Comma-separated list of capacity thresholds (MW) that trigger notifications"
+          }
+        },
+        {
+          "id": "critical_margin",
+          "type": "number",
+          "label": {
+            "en": "Critical Margin"
+          },
+          "value": 500,
+          "min": 0,
+          "max": 5000,
+          "units": {
+            "en": "MW"
+          },
+          "hint": {
+            "en": "Margin below which the system is considered critical"
+          }
+        },
+        {
+          "id": "high_utilization",
+          "type": "number",
+          "label": {
+            "en": "High Utilization Threshold"
+          },
+          "value": 90,
+          "min": 0,
+          "max": 100,
+          "units": {
+            "en": "%"
+          },
+          "hint": {
+            "en": "Utilization percentage above which the system is considered at high risk"
+          }
+        },
+        {
+          "id": "stable_margin",
+          "type": "number",
+          "label": {
+            "en": "Stable Margin"
+          },
+          "value": 3000,
+          "min": 0,
+          "max": 10000,
+          "units": {
+            "en": "MW"
+          },
+          "hint": {
+            "en": "Margin above which the system is considered stable"
+          }
+        }
       ]
     }
   ],
-  "widgets": {
-    "current-stage": {
-      "name": {
-        "en": "Current Stage"
-      },
-      "height": 188,
-      "transparent": false,
-      "settings": [
-        {
-          "id": "showDescription",
-          "type": "checkbox",
-          "title": {
-            "en": "Show Stage Description"
-          },
-          "value": true
-        },
-        {
-          "id": "showLastUpdate",
-          "type": "checkbox",
-          "title": {
-            "en": "Show Last Update Time"
-          },
-          "value": true
-        }
-      ],
-      "api": {
-        "getStage": {
-          "method": "GET",
-          "path": "/stage"
-        }
-      },
-      "id": "current-stage"
-    },
-    "probability-gauge": {
-      "name": {
-        "en": "Probability Gauge"
-      },
-      "height": 250,
-      "transparent": false,
-      "settings": [
-        {
-          "id": "showStage",
-          "type": "checkbox",
-          "title": {
-            "en": "Show Current Stage"
-          },
-          "value": true
-        },
-        {
-          "id": "showLastUpdate",
-          "type": "checkbox",
-          "title": {
-            "en": "Show Last Update Time"
-          },
-          "value": true
-        }
-      ],
-      "api": {
-        "getProbabilities": {
-          "method": "GET",
-          "path": "/probabilities"
-        }
-      },
-      "id": "probability-gauge"
-    }
-  },
   "capabilities": {
     "available_capacity": {
       "type": "number",
@@ -352,19 +2715,167 @@
       "units": "MW",
       "decimals": 0
     },
-    "forecast_highest_stage": {
+    "average_capacity": {
       "type": "number",
       "title": {
-        "en": "Forecast Highest Stage"
+        "en": "Average Capacity"
       },
+      "desc": {
+        "en": "Average available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "units": "MW",
+      "decimals": 0,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg"
+    },
+    "average_demand": {
+      "id": "average_demand",
+      "type": "number",
+      "title": {
+        "en": "Average Demand"
+      },
+      "desc": {
+        "en": "Average power demand forecast in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
       "getable": true,
       "setable": false,
       "insights": true,
       "uiComponent": "sensor",
-      "icon": "/assets/stage.svg",
-      "min": 0,
-      "max": 8,
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "average_margin": {
+      "id": "average_margin",
+      "type": "number",
+      "title": {
+        "en": "Average Margin"
+      },
+      "desc": {
+        "en": "Average power margin in MW"
+      },
+      "min": -50000,
+      "max": 50000,
       "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/margin.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "average_max_availability": {
+      "id": "average_max_availability",
+      "type": "number",
+      "title": {
+        "en": "Average Maximum Availability"
+      },
+      "desc": {
+        "en": "Average maximum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "color_changes": {
+      "id": "color_changes",
+      "type": "number",
+      "title": {
+        "en": "Color Changes"
+      },
+      "desc": {
+        "en": "Number of color changes today"
+      },
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Number of system color changes per day"
+      },
+      "units": {
+        "en": "changes"
+      },
+      "decimals": 0,
+      "min": 0,
+      "chartType": "column",
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/changes.svg"
+    },
+    "current_declared_availability": {
+      "id": "current_declared_availability",
+      "type": "number",
+      "title": {
+        "en": "Current Declared Availability"
+      },
+      "desc": {
+        "en": "Current available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "current_load_forecast": {
+      "id": "current_load_forecast",
+      "type": "number",
+      "title": {
+        "en": "Current Load Forecast"
+      },
+      "desc": {
+        "en": "Current power demand forecast in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "current_max_availability": {
+      "id": "current_max_availability",
+      "type": "number",
+      "title": {
+        "en": "Current Maximum Availability"
+      },
+      "desc": {
+        "en": "Current maximum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
       "decimals": 0
     },
     "last_updated": {
@@ -378,26 +2889,131 @@
       "uiComponent": "sensor",
       "icon": "/assets/update.svg"
     },
-    "loadshedding_stage": {
-      "type": "number",
-      "title": {
-        "en": "Loadshedding Stage"
-      },
-      "getable": true,
-      "setable": false,
-      "insights": true,
-      "uiComponent": "sensor",
-      "icon": "/assets/stage.svg",
-      "min": 0,
-      "max": 8,
-      "step": 1,
-      "decimals": 0
-    },
     "lowest_margin": {
       "type": "number",
       "title": {
         "en": "Lowest Margin"
       },
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/margin-low.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "max_declared_availability": {
+      "id": "max_declared_availability",
+      "type": "number",
+      "title": {
+        "en": "Maximum Declared Availability"
+      },
+      "desc": {
+        "en": "Maximum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "max_load_forecast": {
+      "id": "max_load_forecast",
+      "type": "number",
+      "title": {
+        "en": "Maximum Load Forecast"
+      },
+      "desc": {
+        "en": "Maximum power demand forecast in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "max_max_availability": {
+      "id": "max_max_availability",
+      "type": "number",
+      "title": {
+        "en": "Maximum Maximum Availability"
+      },
+      "desc": {
+        "en": "Maximum maximum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "setable": false,
+      "units": "MW",
+      "decimals": 0
+    },
+    "min_declared_availability": {
+      "id": "min_declared_availability",
+      "type": "number",
+      "title": {
+        "en": "Minimum Declared Availability"
+      },
+      "desc": {
+        "en": "Minimum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "units": "MW",
+      "decimals": 0,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg"
+    },
+    "min_load_forecast": {
+      "id": "min_load_forecast",
+      "type": "number",
+      "title": {
+        "en": "Minimum Load Forecast"
+      },
+      "desc": {
+        "en": "Minimum power demand forecast in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/transmission-tower.svg",
+      "units": "MW",
+      "decimals": 0
+    },
+    "min_max_availability": {
+      "id": "min_max_availability",
+      "type": "number",
+      "title": {
+        "en": "Minimum Maximum Availability"
+      },
+      "desc": {
+        "en": "Minimum maximum available power capacity in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 1,
       "getable": true,
       "setable": false,
       "insights": true,
@@ -418,6 +3034,29 @@
       "icon": "/assets/transmission-tower.svg",
       "units": "MW",
       "decimals": 0
+    },
+    "power_margin": {
+      "id": "power_margin",
+      "type": "number",
+      "title": {
+        "en": "Power Margin"
+      },
+      "desc": {
+        "en": "The difference between available capacity and current load forecast"
+      },
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Power Margin"
+      },
+      "units": {
+        "en": "MW"
+      },
+      "decimals": 0,
+      "chartType": "line",
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/margin.svg"
     },
     "power_probability": {
       "type": "number",
@@ -445,6 +3084,134 @@
       "insights": false,
       "uiComponent": "sensor",
       "icon": "/assets/information-slab-circle-outline.svg"
+    },
+    "system_color": {
+      "id": "system_color",
+      "type": "string",
+      "title": {
+        "en": "System Color"
+      },
+      "desc": {
+        "en": "Current system status color (red/orange/green)"
+      },
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "System Color"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/traffic-light.svg",
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    },
+    "system_direction": {
+      "id": "system_direction",
+      "type": "string",
+      "title": {
+        "en": "System Direction"
+      },
+      "desc": {
+        "en": "Current system direction (up/down/stable)"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/direction.svg",
+      "values": [
+        {
+          "id": "up",
+          "title": {
+            "en": "Up"
+          }
+        },
+        {
+          "id": "down",
+          "title": {
+            "en": "Down"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    },
+    "system_utilization": {
+      "id": "system_utilization",
+      "type": "number",
+      "title": {
+        "en": "System Utilization"
+      },
+      "desc": {
+        "en": "The percentage of available capacity being used"
+      },
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "System Utilization"
+      },
+      "units": {
+        "en": "%"
+      },
+      "decimals": 1,
+      "min": 0,
+      "max": 100,
+      "chartType": "line",
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/utilization.svg"
+    },
+    "trend_status": {
+      "id": "trend_status",
+      "type": "string",
+      "title": {
+        "en": "Trend Status"
+      },
+      "desc": {
+        "en": "Current trend of the power system (increasing/decreasing/stable)"
+      },
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/trend.svg",
+      "values": [
+        {
+          "id": "increasing",
+          "title": {
+            "en": "Increasing"
+          }
+        },
+        {
+          "id": "decreasing",
+          "title": {
+            "en": "Decreasing"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
     }
   }
 }

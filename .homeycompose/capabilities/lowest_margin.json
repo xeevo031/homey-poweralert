@@ -7,7 +7,7 @@
   "setable": false,
   "insights": true,
   "uiComponent": "sensor",
-  "icon": "/assets/transmission-tower.svg",
+  "icon": "/assets/margin-low.svg",
   "units": "MW",
   "decimals": 0
 } 

@@ -5,14 +5,29 @@
   },
   "class": "sensor",
   "capabilities": [
-    "loadshedding_stage",
     "power_probability",
-    "status_message",
     "peak_demand",
     "available_capacity",
     "lowest_margin",
-    "forecast_highest_stage",
-    "last_updated"
+    "last_updated",
+    "average_capacity",
+    "current_load_forecast",
+    "current_declared_availability",
+    "trend_status",
+    "system_direction",
+    "current_max_availability",
+    "average_max_availability",
+    "max_max_availability",
+    "min_max_availability",
+    "max_load_forecast",
+    "min_load_forecast",
+    "max_declared_availability",
+    "min_declared_availability",
+    "average_margin",
+    "average_demand",
+    "system_color",
+    "status_message",
+    "color_changes"
   ],
   "platforms": [
     "local"
@@ -23,7 +38,7 @@
   "images": {
     "small": "/drivers/powerstatus/assets/images/small.png",
     "large": "/drivers/powerstatus/assets/images/large.png"
-   },
+  },
   "pair": [
     {
       "id": "list_devices",
@@ -38,6 +53,105 @@
     {
       "id": "add_devices",
       "template": "add_devices"
+    }
+  ],
+  "settings": [
+    {
+      "id": "update_interval",
+      "type": "number",
+      "label": {
+        "en": "Update Interval"
+      },
+      "value": 5,
+      "min": 1,
+      "max": 60,
+      "units": {
+        "en": "minutes"
+      },
+      "hint": {
+        "en": "How often to update data from PowerAlert (1-60 minutes)"
+      }
+    },
+    {
+      "id": "margin_thresholds",
+      "type": "text",
+      "label": {
+        "en": "Margin Thresholds"
+      },
+      "value": "1000,2000,3000,4000,5000,10000,15000,20000",
+      "hint": {
+        "en": "Comma-separated list of margin thresholds (MW) that trigger notifications"
+      }
+    },
+    {
+      "id": "demand_thresholds",
+      "type": "text",
+      "label": {
+        "en": "Demand Thresholds"
+      },
+      "value": "10000,20000,30000,40000,45000",
+      "hint": {
+        "en": "Comma-separated list of demand thresholds (MW) that trigger notifications"
+      }
+    },
+    {
+      "id": "capacity_thresholds",
+      "type": "text",
+      "label": {
+        "en": "Capacity Thresholds"
+      },
+      "value": "10000,20000,30000,40000,45000",
+      "hint": {
+        "en": "Comma-separated list of capacity thresholds (MW) that trigger notifications"
+      }
+    },
+    {
+      "id": "critical_margin",
+      "type": "number",
+      "label": {
+        "en": "Critical Margin"
+      },
+      "value": 500,
+      "min": 0,
+      "max": 5000,
+      "units": {
+        "en": "MW"
+      },
+      "hint": {
+        "en": "Margin below which the system is considered critical"
+      }
+    },
+    {
+      "id": "high_utilization",
+      "type": "number",
+      "label": {
+        "en": "High Utilization Threshold"
+      },
+      "value": 90,
+      "min": 0,
+      "max": 100,
+      "units": {
+        "en": "%"
+      },
+      "hint": {
+        "en": "Utilization percentage above which the system is considered at high risk"
+      }
+    },
+    {
+      "id": "stable_margin",
+      "type": "number",
+      "label": {
+        "en": "Stable Margin"
+      },
+      "value": 3000,
+      "min": 0,
+      "max": 10000,
+      "units": {
+        "en": "MW"
+      },
+      "hint": {
+        "en": "Margin above which the system is considered stable"
+      }
     }
   ]
 } 

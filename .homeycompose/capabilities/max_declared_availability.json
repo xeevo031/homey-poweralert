@@ -1,0 +1,20 @@
+{
+  "id": "max_declared_availability",
+  "type": "number",
+  "title": {
+    "en": "Maximum Declared Availability"
+  },
+  "desc": {
+    "en": "Maximum available power capacity in MW"
+  },
+  "min": 0,
+  "max": 50000,
+  "step": 1,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/transmission-tower.svg",
+  "units": "MW",
+  "decimals": 0
+} 

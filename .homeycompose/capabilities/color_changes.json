@@ -1,0 +1,24 @@
+{
+  "id": "color_changes",
+  "type": "number",
+  "title": {
+    "en": "Color Changes"
+  },
+  "desc": {
+    "en": "Number of color changes today"
+  },
+  "insights": true,
+  "insightsTitleTrue": {
+    "en": "Number of system color changes per day"
+  },
+  "units": {
+    "en": "changes"
+  },
+  "decimals": 0,
+  "min": 0,
+  "chartType": "column",
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/changes.svg"
+} 

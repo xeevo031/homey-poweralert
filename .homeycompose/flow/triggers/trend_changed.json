@@ -1,0 +1,91 @@
+{
+  "id": "trend_changed",
+  "title": {
+    "en": "System trend changed"
+  },
+  "titleFormatted": {
+    "en": "System trend changed from [[previous_trend]] to [[current_trend]]"
+  },
+  "hint": {
+    "en": "Triggered when the system trend changes"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "previous_trend",
+      "type": "dropdown",
+      "title": {
+        "en": "Previous trend"
+      },
+      "values": [
+        {
+          "id": "increasing",
+          "title": {
+            "en": "Increasing"
+          }
+        },
+        {
+          "id": "decreasing",
+          "title": {
+            "en": "Decreasing"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    },
+    {
+      "name": "current_trend",
+      "type": "dropdown",
+      "title": {
+        "en": "Current trend"
+      },
+      "values": [
+        {
+          "id": "increasing",
+          "title": {
+            "en": "Increasing"
+          }
+        },
+        {
+          "id": "decreasing",
+          "title": {
+            "en": "Decreasing"
+          }
+        },
+        {
+          "id": "stable",
+          "title": {
+            "en": "Stable"
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "previous_trend",
+      "type": "string",
+      "title": {
+        "en": "Previous trend"
+      }
+    },
+    {
+      "name": "current_trend",
+      "type": "string",
+      "title": {
+        "en": "Current trend"
+      }
+    }
+  ],
+  "icon": "arrow-trend",
+  "category": "system_status"
+} 

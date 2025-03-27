@@ -1,10 +1,10 @@
 {
-  "id": "update_data",
+  "id": "system_improving",
   "title": {
-    "en": "Update Power Status Data"
+    "en": "System !{{is|is not}} improving"
   },
   "hint": {
-    "en": "Manually trigger an update of the power status data"
+    "en": "When the system margin is increasing and demand is decreasing"
   },
   "args": [
     {

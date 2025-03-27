@@ -1,0 +1,79 @@
+{
+  "id": "forecast_time_period_status",
+  "title": {
+    "en": "Forecast Time Period Status"
+  },
+  "titleFormatted": {
+    "en": "[[time_period]] forecast becomes [[status]]"
+  },
+  "hint": {
+    "en": "Triggers when a specific time period in the forecast matches a status"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "time_period",
+      "type": "dropdown",
+      "title": {
+        "en": "Time Period"
+      },
+      "values": [
+        {
+          "id": "morning",
+          "title": {
+            "en": "Morning (06:00-09:00)"
+          }
+        },
+        {
+          "id": "midday",
+          "title": {
+            "en": "Midday (11:00-14:00)"
+          }
+        },
+        {
+          "id": "evening",
+          "title": {
+            "en": "Evening (18:00-21:00)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "status",
+      "type": "dropdown",
+      "title": {
+        "en": "Status Color"
+      },
+      "values": [
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        },
+        {
+          "id": "yellow",
+          "title": {
+            "en": "Yellow"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        }
+      ]
+    }
+  ]
+} 

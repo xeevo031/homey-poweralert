@@ -1,10 +1,10 @@
 {
-  "id": "update_data",
+  "id": "system_critical",
   "title": {
-    "en": "Update Power Status Data"
+    "en": "System !{{is|is not}} critical"
   },
   "hint": {
-    "en": "Manually trigger an update of the power status data"
+    "en": "When the power margin is below 500MW"
   },
   "args": [
     {

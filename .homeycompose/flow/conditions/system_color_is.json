@@ -1,0 +1,43 @@
+{
+  "id": "system_color_is",
+  "title": {
+    "en": "System color !{{is|is not}}"
+  },
+  "titleFormatted": {
+    "en": "System color !{{is|is not}} [[color]]"
+  },
+  "hint": {
+    "en": "Check if the current system color matches the specified value."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "color",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "red",
+          "title": {
+            "en": "Red"
+          }
+        },
+        {
+          "id": "orange",
+          "title": {
+            "en": "Orange"
+          }
+        },
+        {
+          "id": "green",
+          "title": {
+            "en": "Green"
+          }
+        }
+      ]
+    }
+  ]
+} 
