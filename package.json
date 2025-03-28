@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "homey": "^3.7.15",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^16.1.3",
