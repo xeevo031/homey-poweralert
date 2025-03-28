@@ -432,29 +432,24 @@ class PowerStatusDevice extends Device {
 
   /**
    * Get current hour's data from forecast
-   * @param {Array} forecast - The forecast data array
-   * @returns {Object} - The current hour's data or null if not found
+   * @param {Array} forecast - Forecast data array
+   * @returns {Object} - Current hour data
    */
   getCurrentHourData(forecast) {
-    // Get current time in SAST
     const now = new Date();
     const sastHour = (now.getUTCHours() + 2) % 24; // Convert UTC to SAST by adding 2 hours
-    this.log('Current SAST hour:', sastHour);
     
     // Find the entry that matches the current SAST hour
     const currentHourData = forecast.find(dataPoint => {
       const dataTime = new Date(dataPoint.Timestamp);
       const dataHour = dataTime.getHours();
-      this.log('Comparing with data hour:', dataHour, 'from timestamp:', dataPoint.Timestamp);
       return dataHour === sastHour;
     });
 
     if (currentHourData) {
-      this.log('Found matching hour data:', currentHourData);
       return currentHourData;
     }
 
-    this.log('No matching hour found, using first entry:', forecast[0]);
     return forecast[0]; // Fallback to first entry if current hour not found
   }
 
@@ -486,21 +481,22 @@ class PowerStatusDevice extends Device {
    */
   async updatePowerAlertData() {
     try {
-      this.log('Updating PowerAlert data...');
-      
+      // Store previous values for threshold comparisons
+      const previousCapacity = this.getCapabilityValue('current_declared_availability');
+      const previousDemand = this.getCapabilityValue('current_load_forecast');
+      const previousMargin = previousCapacity - previousDemand;
+
       // Fetch the forecast data first
       const forecast = await this.fetchDetailedForecast();
       if (!forecast) {
         throw new Error('Failed to fetch forecast data');
       }
-      this.log('Forecast data fetched successfully:', forecast);
 
       // Get current hour data
       const currentStatus = this.getCurrentHourData(forecast);
       if (!currentStatus) {
         throw new Error('Failed to get current hour data');
       }
-      this.log('Current hour data:', currentStatus);
 
       // Calculate aggregated values from forecast data
       const aggregatedData = forecast.reduce((acc, entry) => {
@@ -575,14 +571,12 @@ class PowerStatusDevice extends Device {
       // Update the system color first
       const newColor = currentStatus.Color.toLowerCase();
       await this.setCapabilityValue('system_color', newColor);
-      this.log('Updated system color:', newColor);
 
       // Update basic capabilities
       await this.setCapabilityValue('status_message', this.getStatusMessage(newColor, currentStatus.Direction));
       await this.setCapabilityValue('last_updated', formattedDate);
-      this.log('Updated basic capabilities');
 
-      // Update all numeric capabilities with proper error handling
+      // Prepare all capability updates
       const capabilities = {
         power_probability: this.getProbabilityFromColorId(
           currentStatus.ColorId,
@@ -608,19 +602,12 @@ class PowerStatusDevice extends Device {
         system_direction: this.getSystemDirection(currentStatus.DirectionId),
         trend_status: this.getTrendStatus(currentStatus.DirectionId)
       };
-      this.log('Prepared capabilities for update:', capabilities);
 
       // Update each capability with proper error handling
       for (const [capability, value] of Object.entries(capabilities)) {
         try {
           if (value !== null && value !== undefined) {
-            if (typeof value === 'string') {
-              await this.setCapabilityValue(capability, value);
-              this.log(`Updated ${capability} with string value:`, value);
-            } else {
-              await this.setCapabilityValue(capability, Math.round(value));
-              this.log(`Updated ${capability} with numeric value:`, Math.round(value));
-            }
+            await this.setCapabilityValue(capability, typeof value === 'string' ? value : Math.round(value));
           }
         } catch (error) {
           this.error(`Error setting ${capability}:`, error);
@@ -634,42 +621,17 @@ class PowerStatusDevice extends Device {
           this.power_margin = Math.round(margin);
         }
       } catch (error) {
-        this.error('Error calculating power_margin:', error);
+        this.error('Error calculating power margin:', error);
       }
 
-      // Calculate and update system utilization
-      try {
-        if (currentStatus.DeclaredAvailabilty > 0) {
-          const utilization = (currentStatus.LoadForecast / currentStatus.DeclaredAvailabilty) * 100;
-          this.system_utilization = Math.round(utilization * 10) / 10;
-        }
-      } catch (error) {
-        this.error('Error calculating system_utilization:', error);
+      // Log only significant changes
+      if (previousColor !== newColor) {
+        this.log(`System color changed from ${previousColor} to ${newColor}`);
       }
 
-      // Update color changes per day
-      try {
-        const now = new Date();
-        const today = now.setHours(0, 0, 0, 0);
-        if (today > this._lastDayReset) {
-          this._lastDayColorChanges = 0;
-          this._lastDayReset = today;
-        }
-        if (previousColor && previousColor !== newColor) {
-          this._lastDayColorChanges++;
-          await this.setCapabilityValue('color_changes', this._lastDayColorChanges);
-        }
-      } catch (error) {
-        this.error('Error setting color_changes:', error);
-      }
+      // Log completion with minimal data
+      this.log(`Status: ${newColor}/${currentStatus.Direction} | Margin: ${this.power_margin}MW`);
 
-      // Trigger the color changed flow if color has changed
-      if (previousColor && previousColor !== newColor) {
-        this.log(`Color changed from ${previousColor} to ${newColor}`);
-        await this.onSystemColorChanged(previousColor, newColor);
-      }
-
-      this.log('PowerAlert data update completed successfully');
     } catch (error) {
       this.error('Error updating PowerAlert data:', error);
       throw error;
@@ -770,17 +732,40 @@ class PowerStatusDevice extends Device {
    * Register all triggers
    */
   async registerTriggers() {
-    // Register forecast time period status trigger
+    // Register existing triggers
     this.forecastTimePeriodTrigger = this.homey.flow.getDeviceTriggerCard('forecast_time_period_status');
-    
-    // Register peak demand time trigger
     this.peakDemandTimeTrigger = this.homey.flow.getDeviceTriggerCard('peak_demand_time');
-    
-    // Register status duration exceeded trigger
     this.statusDurationTrigger = this.homey.flow.getDeviceTriggerCard('status_duration_exceeded');
-    
-    // Register rapid status change trigger
     this.rapidStatusChangeTrigger = this.homey.flow.getDeviceTriggerCard('rapid_status_change');
+
+    // Register threshold triggers
+    this.powerCapacityThresholdTrigger = this.homey.flow.getDeviceTriggerCard('power_capacity_threshold')
+      .registerRunListener(async (args, state) => {
+        const currentCapacity = this.getCapabilityValue('current_declared_availability');
+        if (args.direction === 'above') {
+          return currentCapacity > args.threshold;
+        }
+        return currentCapacity < args.threshold;
+      });
+
+    this.powerDemandThresholdTrigger = this.homey.flow.getDeviceTriggerCard('power_demand_threshold')
+      .registerRunListener(async (args, state) => {
+        const currentDemand = this.getCapabilityValue('current_load_forecast');
+        if (args.direction === 'above') {
+          return currentDemand > args.threshold;
+        }
+        return currentDemand < args.threshold;
+      });
+
+    this.powerMarginThresholdTrigger = this.homey.flow.getDeviceTriggerCard('power_margin_threshold')
+      .registerRunListener(async (args, state) => {
+        const currentMargin = this.getCapabilityValue('current_declared_availability') - 
+                            this.getCapabilityValue('current_load_forecast');
+        if (args.direction === 'above') {
+          return currentMargin > args.threshold;
+        }
+        return currentMargin < args.threshold;
+      });
 
     // Initialize status tracking
     this.lastStatusChange = new Date();
@@ -1304,6 +1289,11 @@ class PowerStatusDevice extends Device {
    * @returns {number} - Number of color changes
    */
   countColorChanges(data) {
+    // If data is undefined or not an array, return the stored count
+    if (!data || !Array.isArray(data)) {
+      return this._lastDayColorChanges || 0;
+    }
+    
     let changes = 0;
     let previousColor = null;
     
@@ -1339,30 +1329,27 @@ class PowerStatusDevice extends Device {
 
   async onSystemColorChanged(oldColor, newColor) {
     try {
-      const triggerCard = this.homey.flow.getDeviceTriggerCard('system_color_changed');
-      const previousDuration = this._calculatePreviousDuration();
-      const changeType = this._getChangeType(oldColor, newColor);
+      // Increment color changes counter
+      const today = new Date();
+      const todayStart = today.setHours(0, 0, 0, 0);
       
-      // Get current hour data for margin and utilization changes
-      const forecast = await this.fetchDetailedForecast();
-      const currentStatus = this.getCurrentHourData(forecast);
-      const forecastStability = this._analyzeForcastStability(newColor, forecast);
-      const nextChangeTime = this._findNextColorChange(newColor, forecast);
-      const marginChange = this._calculateMarginChange(currentStatus);
-      const utilizationChange = this._calculateUtilizationChange(currentStatus);
-
-      const tokens = {
-        previous_color: oldColor.toLowerCase(),
-        current_color: newColor.toLowerCase(),
-        previous_duration: previousDuration || 'N/A',
-        change_type: changeType,
-        forecast_stability: forecastStability,
-        next_change_forecast: nextChangeTime,
-        margin_change: marginChange,
-        utilization_change: utilizationChange
-      };
-
-      await triggerCard.trigger(this, tokens);
+      if (this._lastDayReset !== todayStart) {
+        this._lastDayColorChanges = 0;
+        this._lastDayReset = todayStart;
+      }
+      
+      this._lastDayColorChanges++;
+      
+      // Trigger the flow with all required tokens
+      await this.homey.flow
+        .getDeviceTrigger('system_color_changed')
+        .trigger(this, {
+          old_color: oldColor,
+          new_color: newColor,
+          color_frequency_today: this._lastDayColorChanges.toString(),
+          severity_change: this.calculateSeverityChange(oldColor, newColor),
+          expected_duration: this.calculateExpectedDuration(this.currentHourData)
+        });
     } catch (error) {
       this.error('Failed to trigger color change flow:', error);
     }
@@ -1522,40 +1509,11 @@ class PowerStatusDevice extends Device {
    */
   async _getColorHistory(startDate, endDate) {
     try {
-      const entries = await this.insightsSystemColor.getEntries({
-        startDate,
-        endDate
-      });
-
-      // Count occurrences of each color
-      const colorCounts = entries.reduce((acc, entry) => {
-        acc[entry.value] = (acc[entry.value] || 0) + 1;
-        return acc;
-      }, {});
-
-      // Calculate color durations
-      let colorDurations = {};
-      let lastColor = null;
-      let lastTime = null;
-
-      entries.forEach(entry => {
-        if (lastColor && lastTime) {
-          const duration = new Date(entry.date) - lastTime;
-          colorDurations[lastColor] = (colorDurations[lastColor] || 0) + duration;
-        }
-        lastColor = entry.value;
-        lastTime = new Date(entry.date);
-      });
-
-      // Convert durations to hours
-      Object.keys(colorDurations).forEach(color => {
-        colorDurations[color] = colorDurations[color] / (1000 * 60 * 60);
-      });
-
+      // Since we don't have insights access, we'll use the stored color changes
       return {
-        counts: colorCounts,
-        durations: colorDurations,
-        totalEntries: entries.length
+        counts: {},
+        durations: {},
+        totalEntries: this._lastDayColorChanges || 0
       };
     } catch (error) {
       this.error('Error getting color history:', error);

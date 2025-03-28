@@ -1,6 +1,6 @@
 {
   "id": "za.co.poweralert",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "compatibility": ">=12.1.2",
   "sdk": 3,
   "platforms": [
@@ -28,7 +28,22 @@
     "url": "https://github.com/xeevo031/homey-poweralert/issues"
   },
   "source": "https://github.com/xeevo031/homey-poweralert",
-  "capabilities": [],
+  "capabilities": {
+    "color_changes": {
+      "type": "number",
+      "title": {
+        "en": "Color Changes"
+      },
+      "description": {
+        "en": "Number of color changes today"
+      },
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "uiComponent": "sensor",
+      "insights": true
+    }
+  },
   "settings": [
     {
       "type": "group",

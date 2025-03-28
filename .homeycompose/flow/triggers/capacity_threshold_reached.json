@@ -1,19 +1,53 @@
 {
-  "id": "capacity_threshold_reached",
+  "id": "power_capacity_threshold",
   "title": {
-    "en": "Capacity Threshold Reached"
+    "en": "Power capacity threshold"
   },
   "titleFormatted": {
-    "en": "Power capacity [[direction]] threshold of [[threshold]] MW (current: [[current_capacity]] MW)"
+    "en": "Power capacity is [[direction]] [[threshold]] MW"
   },
   "hint": {
     "en": "Triggered when the power capacity crosses a configured threshold"
   },
   "args": [
     {
-      "type": "device",
       "name": "device",
+      "type": "device",
       "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Direction"
+      },
+      "values": [
+        {
+          "id": "above",
+          "title": {
+            "en": "Above"
+          }
+        },
+        {
+          "id": "below",
+          "title": {
+            "en": "Below"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold"
+      },
+      "placeholder": {
+        "en": "Enter threshold in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 100
     }
   ],
   "tokens": [

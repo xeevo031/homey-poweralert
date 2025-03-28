@@ -1,19 +1,53 @@
 {
-  "id": "margin_threshold_reached",
+  "id": "power_margin_threshold",
   "title": {
-    "en": "Margin Threshold Reached"
+    "en": "Power margin threshold"
   },
   "titleFormatted": {
-    "en": "Power margin [[direction]] threshold of [[threshold]] MW (current: [[current_margin]] MW)"
+    "en": "Power margin is [[direction]] [[threshold]] MW"
   },
   "hint": {
-    "en": "Triggered when the power margin crosses a configured threshold"
+    "en": "Triggered when the power margin (available capacity minus demand) crosses a configured threshold"
   },
   "args": [
     {
-      "type": "device",
       "name": "device",
+      "type": "device",
       "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Direction"
+      },
+      "values": [
+        {
+          "id": "above",
+          "title": {
+            "en": "Above"
+          }
+        },
+        {
+          "id": "below",
+          "title": {
+            "en": "Below"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold"
+      },
+      "placeholder": {
+        "en": "Enter threshold in MW"
+      },
+      "min": -5000,
+      "max": 20000,
+      "step": 100
     }
   ],
   "tokens": [
@@ -23,7 +57,7 @@
       "title": {
         "en": "Threshold Value (MW)"
       },
-      "example": 5000
+      "example": 0
     },
     {
       "name": "current_margin",
@@ -31,7 +65,7 @@
       "title": {
         "en": "Current Margin (MW)"
       },
-      "example": 4800
+      "example": -1000
     },
     {
       "name": "previous_margin",
@@ -39,7 +73,7 @@
       "title": {
         "en": "Previous Margin (MW)"
       },
-      "example": 5200
+      "example": 500
     },
     {
       "name": "direction",
@@ -50,20 +84,12 @@
       "example": "below"
     },
     {
-      "name": "time_until_recovery",
-      "type": "number",
-      "title": {
-        "en": "Expected Time Until Recovery (minutes)"
-      },
-      "example": 120
-    },
-    {
       "name": "rate_of_change",
       "type": "number",
       "title": {
         "en": "Rate of Change (MW/hour)"
       },
-      "example": -200
+      "example": -1500
     },
     {
       "name": "historical_comparison",
@@ -71,7 +97,7 @@
       "title": {
         "en": "Historical Comparison"
       },
-      "example": "15% worse than typical Tuesday"
+      "example": "Critical - Lowest margin this month"
     },
     {
       "name": "trend_direction",
@@ -79,15 +105,7 @@
       "title": {
         "en": "Trend Direction"
       },
-      "example": "deteriorating"
-    },
-    {
-      "name": "confidence_level",
-      "type": "number",
-      "title": {
-        "en": "Forecast Confidence Level (%)"
-      },
-      "example": 85
+      "example": "decreasing"
     }
   ],
   "icon": "gauge",

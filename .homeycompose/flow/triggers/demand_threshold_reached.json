@@ -1,19 +1,53 @@
 {
-  "id": "demand_threshold_reached",
+  "id": "power_demand_threshold",
   "title": {
-    "en": "Demand Threshold Reached"
+    "en": "Power demand threshold"
   },
   "titleFormatted": {
-    "en": "Power demand [[direction]] threshold of [[threshold]] MW (current: [[current_demand]] MW)"
+    "en": "Power demand is [[direction]] [[threshold]] MW"
   },
   "hint": {
     "en": "Triggered when the power demand crosses a configured threshold"
   },
   "args": [
     {
-      "type": "device",
       "name": "device",
+      "type": "device",
       "filter": "driver_id=powerstatus"
+    },
+    {
+      "name": "direction",
+      "type": "dropdown",
+      "title": {
+        "en": "Direction"
+      },
+      "values": [
+        {
+          "id": "above",
+          "title": {
+            "en": "Above"
+          }
+        },
+        {
+          "id": "below",
+          "title": {
+            "en": "Below"
+          }
+        }
+      ]
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": {
+        "en": "Threshold"
+      },
+      "placeholder": {
+        "en": "Enter threshold in MW"
+      },
+      "min": 0,
+      "max": 50000,
+      "step": 100
     }
   ],
   "tokens": [
@@ -23,7 +57,7 @@
       "title": {
         "en": "Threshold Value (MW)"
       },
-      "example": 40000
+      "example": 25000
     },
     {
       "name": "current_demand",
@@ -31,7 +65,7 @@
       "title": {
         "en": "Current Demand (MW)"
       },
-      "example": 42000
+      "example": 24000
     },
     {
       "name": "previous_demand",
@@ -39,7 +73,7 @@
       "title": {
         "en": "Previous Demand (MW)"
       },
-      "example": 38000
+      "example": 23000
     },
     {
       "name": "direction",
@@ -50,20 +84,12 @@
       "example": "above"
     },
     {
-      "name": "time_until_recovery",
-      "type": "number",
-      "title": {
-        "en": "Expected Time Until Recovery (minutes)"
-      },
-      "example": 180
-    },
-    {
       "name": "rate_of_change",
       "type": "number",
       "title": {
         "en": "Rate of Change (MW/hour)"
       },
-      "example": 400
+      "example": 1000
     },
     {
       "name": "historical_comparison",
@@ -80,6 +106,14 @@
         "en": "Trend Direction"
       },
       "example": "increasing"
+    },
+    {
+      "name": "time_until_recovery",
+      "type": "number",
+      "title": {
+        "en": "Expected Time Until Recovery (minutes)"
+      },
+      "example": 180
     },
     {
       "name": "confidence_level",

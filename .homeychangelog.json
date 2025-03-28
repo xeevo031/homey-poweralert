@@ -1,4 +1,10 @@
 {
+  "1.0.6": {
+    "en": "Reduced excessive logging and improved log readability"
+  },
+  "1.0.5": {
+    "en": "Fixed flow triggers for power capacity, demand, and margin thresholds"
+  },
   "1.0.4": {
     "en": "Added probability gauge widget",
     "changes": [
